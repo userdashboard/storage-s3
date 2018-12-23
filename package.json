@@ -1,0 +1,22 @@
+{
+  "name": "@userappstore/storage-s3",
+  "version": "1.0.0",
+  "main": "index.js",
+  "description": "Use Amazon S3 as storage for Dashboard",
+  "engine": {
+    "node": "8.1.14",
+    "npm": "5.0.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://gitlab.com/userappstore/storage-s3.git"
+  },
+  "license": "SPDX(MIT OR Unlicense)",
+  "scripts": {
+    "start": "node main.js",
+    "test": "NODE_ENV=testing mocha node_modules/@userappstore/dashboard/src --recursive --timeout 480000 --slow 480000"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.382.0"
+  }
+}
