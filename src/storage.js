@@ -9,7 +9,7 @@ if (process.env.S3_ENDPOINT) {
 }
 
 const AWS = require('aws-sdk')
-AWS.config.update()
+AWS.config.update(config)
 const s3 = new AWS.S3()
 const storagePath = process.env.STORAGE_PATH || `/data`
 
