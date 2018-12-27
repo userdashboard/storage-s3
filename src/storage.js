@@ -1,3 +1,4 @@
+const AWS = require('aws-sdk')
 const config = {
   accessKeyId: process.env.ACCESS_KEY_ID,
   secretAccessKey: process.env.SECRET_ACCESS_KEY
@@ -8,7 +9,6 @@ if (process.env.S3_ENDPOINT) {
   config.endpoint = spacesEndpoint
 }
 
-const AWS = require('aws-sdk')
 AWS.config.update(config)
 const s3 = new AWS.S3()
 const storagePath = process.env.STORAGE_PATH || `/data`
