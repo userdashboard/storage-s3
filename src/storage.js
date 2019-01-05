@@ -15,6 +15,7 @@ const storagePath = process.env.STORAGE_PATH || `/data`
 
 module.exports = {
   exists,
+  list,
   read,
   readMany,
   readImage,
@@ -145,4 +146,14 @@ async function readImage(file) {
     throw new Error('invalid-file')
   }
   return object.Body
+}
+
+async function list (path) {
+  const params = {
+    Bucket: process.env.S3_BUCKET_NAME,
+    MaxKeys: 2147483647,
+    Prefix: path
+  };
+  let data = await s3.listObjectsV2(params).promise()
+  return data.contents
 }
