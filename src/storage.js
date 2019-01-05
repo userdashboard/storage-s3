@@ -16,6 +16,7 @@ const storagePath = process.env.STORAGE_PATH || `/data`
 module.exports = {
   exists,
   read,
+  readMany,
   readImage,
   write,
   writeImage,
@@ -106,6 +107,27 @@ async function read(file) {
     throw new Error('invalid-file')
   }
   return object.Body.toString('utf-8')
+}
+
+async function readMany(files) {
+  if (!files || !files.length) {
+    throw new Error('invalid-files')
+  }
+  const params = {
+    Bucket: process.env.S3_BUCKET_NAME
+  }
+  const data = {}
+  for (const file in files) {
+    params.Key = `${storagePath}/${file}`
+    let object
+    try {
+      object = await s3.getObject(params).promise()
+    } catch (error) {
+      throw new Error('invalid-file')
+    }
+    data[file] = object.Body.toString('utf-8')
+  }
+  return data
 }
 
 async function readImage(file) {
