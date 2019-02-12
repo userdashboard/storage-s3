@@ -160,7 +160,7 @@ async function list (path) {
   } catch (error) {
   }
   if (data && data.Contents && data.Contents.length) {
-    return data.contents
+    return data.Contents
   }
   return null
 }
