@@ -160,7 +160,11 @@ async function list (path) {
   } catch (error) {
   }
   if (data && data.Contents && data.Contents.length) {
-    return data.Contents
+    const files = []
+    for (const item of data.Contents) {
+      files.push(item.Key.substring(storagePath.length + 1))
+    }
+    return files
   }
   return null
 }
