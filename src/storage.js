@@ -153,7 +153,14 @@ async function list (path) {
     Bucket: process.env.S3_BUCKET_NAME,
     MaxKeys: 2147483647,
     Prefix: `${storagePath}/${path}`
-  };
-  const data = await s3.listObjectsV2(params).promise()
-  return data.Contents
+  }
+  let data
+  try {
+    data = await s3.listObjectsV2(params).promise()
+  } catch (error) {
+  }
+  if (data && data.Contents && data.Contents.length) {
+    return data.contents
+  }
+  return null
 }
