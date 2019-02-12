@@ -152,8 +152,8 @@ async function list (path) {
   const params = {
     Bucket: process.env.S3_BUCKET_NAME,
     MaxKeys: 2147483647,
-    Prefix: path
+    Prefix: `${storagePath}/${path}`
   };
-  let data = await s3.listObjectsV2(params).promise()
-  return data.contents
+  const data = await s3.listObjectsV2(params).promise()
+  return data.Contents
 }
