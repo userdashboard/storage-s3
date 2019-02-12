@@ -22,11 +22,11 @@ async function add(path, itemid) {
 }
 
 async function count(path) {
-  return Storage.list(path).length
+  return Storage.list(`list/${path}`).length
 }
 
 async function listAll(path) {
-  return Storage.list(path)
+  return Storage.list(`list/${path}`)
 }
 
 async function list(path, offset, pageSize) {
@@ -40,7 +40,7 @@ async function list(path, offset, pageSize) {
   if (offset && offset >= pageSize) {
     throw new Error('invalid-offset')
   }
-  list = await Storage.list(path)
+  list = await Storage.list(`list/${path}`)
   if (!list || !list.length) {
     return null
   }
