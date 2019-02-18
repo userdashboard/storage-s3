@@ -26,7 +26,14 @@ async function count(path) {
 }
 
 async function listAll(path) {
-  return Storage.list(`list/${path}`)
+  const list = Storage.list(`list/${path}`)
+  if (!list || !list.length) {
+    return null
+  }
+  for (const i in list) {
+    list[i] = list[i].split('/').pop()
+  }
+  return list
 }
 
 async function list(path, offset, pageSize) {
@@ -49,6 +56,9 @@ async function list(path, offset, pageSize) {
   }
   if (list.length > pageSize) {
     list = list.slice(0, pageSize)
+  }
+  for (const i in list) {
+    list[i] = list[i].split('/').pop()
   }
   return list
 }
