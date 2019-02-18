@@ -118,7 +118,7 @@ async function readMany(files) {
     Bucket: process.env.S3_BUCKET_NAME
   }
   const data = {}
-  for (const file in files) {
+  for (const file of files) {
     params.Key = `${storagePath}/${file}`
     let object
     try {
