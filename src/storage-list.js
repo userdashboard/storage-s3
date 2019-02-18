@@ -22,7 +22,11 @@ async function add(path, itemid) {
 }
 
 async function count(path) {
-  return Storage.list(`list/${path}`).length
+  const all = Storage.list(`list/${path}`)
+  if (!all || !all.length) {
+    return 0
+  }
+  return all.length
 }
 
 async function listAll(path) {
