@@ -110,7 +110,7 @@ async function read(file) {
   return object.Body.toString('utf-8')
 }
 
-async function readMany(files) {
+async function readMany(prefix, files) {
   if (!files || !files.length) {
     throw new Error('invalid-files')
   }
@@ -119,7 +119,7 @@ async function readMany(files) {
   }
   const data = {}
   for (const file of files) {
-    params.Key = `${storagePath}/${file}`
+    params.Key = `${storagePath}/${prefix}/${file}`
     let object
     try {
       object = await s3.getObject(params).promise()
