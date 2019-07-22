@@ -48,9 +48,6 @@ async function list(path, offset, pageSize) {
   if (offset < 0) {
     throw new Error('invalid-offset')
   }
-  if (offset && offset >= pageSize) {
-    throw new Error('invalid-offset')
-  }
   list = await Storage.list(`list/${path}`)
   if (!list || !list.length) {
     return null
