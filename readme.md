@@ -15,6 +15,18 @@ To use with S3-equivalent services such as [Digital Ocean\'s spaces]() requires 
 
 To test this module use [Dashboard](https://github.com/userdashboard/dashboard)'s test suite configured with this storage engine.
 
+# Dashboard
+
+Dashboard is a NodeJS project that provides a reusable account management system for web applications. 
+
+Dashboard proxies your application server to create a single website where pages like signing in or changing your password are provided by Dashboard.  Your application server can be anything you want, and use Dashboard's API to access data as required.
+
+Using modules you can expand Dashboard to include organizations, subscriptions powered by Stripe, or a Stripe Connect platform.
+
+- [Developer documentation home](https://userdashboard.github.io/developers/)
+- [Administrator documentation home](https://userdashboard.github.io/administrators/)
+- [User documentation home](https://userdashboard.github.io/users/)
+
 #### Development
 
 Development takes place on [Github](https://github.com/userdashboard/storage-s3) with releases on [NPM](https://www.npmjs.com/package/@userdashboard/storage-s3).
