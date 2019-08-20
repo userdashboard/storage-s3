@@ -73,7 +73,7 @@ async function write(file, contents) {
   const params = {
     Bucket: process.env.S3_BUCKET_NAME,
     Key: `${storagePath}/${file}`,
-    Body: contents.toString('utf-8')
+    Body: contents.toString()
   }
   await s3.putObject(params).promise()
 }
@@ -107,7 +107,7 @@ async function read(file) {
   } catch (error) {
     throw new Error('invalid-file')
   }
-  return object.Body.toString('utf-8')
+  return object.Body.toString()
 }
 
 async function readMany(prefix, files) {
@@ -126,7 +126,7 @@ async function readMany(prefix, files) {
     } catch (error) {
       throw new Error('invalid-file')
     }
-    data[file] = object.Body.toString('utf-8')
+    data[file] = object.Body.toString()
   }
   return data
 }
