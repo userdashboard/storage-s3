@@ -15,13 +15,7 @@ To use with S3-equivalent services such as [Digital Ocean\'s spaces]() requires 
 
 To test this module use [Dashboard](https://github.com/userdashboard/dashboard)'s test suite configured with this storage engine.
 
-## Support and documentation
 
-Join the freenode IRC #dashboard chatroom for support.  [Web IRC client](https://kiwiirc.com/nextclient/)
-
-- [Developer documentation home](https://userdashboard.github.io/home)
-- [Administrator documentation home](https://userdashboard.github.io/administrators/home)
-- [User documentation home](https://userdashboard.github.io/users/home)
 
 # Dashboard
 
@@ -30,6 +24,10 @@ Dashboard is a NodeJS project that provides a reusable account management system
 Dashboard proxies your application server to create a single website where pages like signing in or changing your password are provided by Dashboard.  Your application server can be anything you want, and use Dashboard's API to access data as required.
 
 Using modules you can expand Dashboard to include organizations, subscriptions powered by Stripe, or a Stripe Connect platform.
+
+## Support and documentation
+
+Join the freenode IRC #dashboard chatroom for support.  [Web IRC client](https://kiwiirc.com/nextclient/)
 
 - [Developer documentation home](https://userdashboard.github.io/home)
 - [Administrator documentation home](https://userdashboard.github.io/administrators/home)
