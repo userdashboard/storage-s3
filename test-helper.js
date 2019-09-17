@@ -1,3 +1,4 @@
+/* eslint-env mocha */
 beforeEach(async () => {
   await deleteS3Data()
 })
@@ -10,7 +11,7 @@ after(async () => {
   await deleteS3Data()
 })
 
-async function deleteS3Data() {
+async function deleteS3Data () {
   const AWS = require('aws-sdk')
   AWS.config.update({
     accessKeyId: process.env.ACCESS_KEY_ID,
@@ -31,7 +32,7 @@ async function deleteS3Data() {
   await s3.deleteObjects(params).promise()
 }
 
-async function readS3() {
+async function readS3 () {
   const AWS = require('aws-sdk')
   AWS.config.update({
     accessKeyId: process.env.ACCESS_KEY_ID,

@@ -9,19 +9,19 @@ module.exports = {
   remove
 }
 
-async function exists(path, itemid) {
+async function exists (path, itemid) {
   return Storage.exists(`list/${path}/${itemid}`)
 }
 
-async function add(path, itemid) {
+async function add (path, itemid) {
   const exists = await Storage.exists(`list/${path}/${itemid}`)
   if (exists) {
-    return callback()
+    return
   }
   return Storage.write(`list/${path}/${itemid}`, '')
 }
 
-async function count(path) {
+async function count (path) {
   const all = Storage.list(`list/${path}`)
   if (!all || !all.length) {
     return 0
@@ -29,7 +29,7 @@ async function count(path) {
   return all.length
 }
 
-async function listAll(path) {
+async function listAll (path) {
   const list = Storage.list(`list/${path}`)
   if (!list || !list.length) {
     return null
@@ -40,7 +40,7 @@ async function listAll(path) {
   return list
 }
 
-async function list(path, offset, pageSize) {
+async function list (path, offset, pageSize) {
   offset = offset || 0
   if (pageSize === null || pageSize === undefined) {
     pageSize = global.pageSize
@@ -48,7 +48,7 @@ async function list(path, offset, pageSize) {
   if (offset < 0) {
     throw new Error('invalid-offset')
   }
-  list = await Storage.list(`list/${path}`)
+  let list = await Storage.list(`list/${path}`)
   if (!list || !list.length) {
     return null
   }
@@ -64,6 +64,6 @@ async function list(path, offset, pageSize) {
   return list
 }
 
-async function remove(path, itemid) {
+async function remove (path, itemid) {
   return Storage.deleteFile(`list/${path}/${itemid}`)
 }

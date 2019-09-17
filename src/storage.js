@@ -11,7 +11,7 @@ if (process.env.S3_ENDPOINT) {
 
 AWS.config.update(config)
 const s3 = new AWS.S3()
-const storagePath = process.env.STORAGE_PATH || `/data`
+const storagePath = process.env.STORAGE_PATH || '/data'
 
 module.exports = {
   exists,
@@ -42,7 +42,7 @@ async function exists (file) {
   return found
 }
 
-async function deleteFile(path) {
+async function deleteFile (path) {
   if (!path) {
     throw new Error('invalid-file')
   }
@@ -56,11 +56,11 @@ async function deleteFile(path) {
   try {
     await s3.deleteObject(params).promise()
   } catch (error) {
-    throw new Error(`invalid-file`)
+    throw new Error('invalid-file')
   }
 }
 
-async function write(file, contents) {
+async function write (file, contents) {
   if (!file) {
     throw new Error('invalid-file')
   }
@@ -78,7 +78,7 @@ async function write(file, contents) {
   await s3.putObject(params).promise()
 }
 
-async function writeImage(file, buffer) {
+async function writeImage (file, buffer) {
   if (!file) {
     throw new Error('invalid-file')
   }
@@ -93,7 +93,7 @@ async function writeImage(file, buffer) {
   await s3.putObject(params).promise()
 }
 
-async function read(file) {
+async function read (file) {
   if (!file) {
     throw new Error('invalid-file')
   }
@@ -110,7 +110,7 @@ async function read(file) {
   return object.Body.toString()
 }
 
-async function readMany(prefix, files) {
+async function readMany (prefix, files) {
   if (!files || !files.length) {
     throw new Error('invalid-files')
   }
@@ -131,7 +131,7 @@ async function readMany(prefix, files) {
   return data
 }
 
-async function readImage(file) {
+async function readImage (file) {
   if (!file) {
     throw new Error('invalid-file')
   }
