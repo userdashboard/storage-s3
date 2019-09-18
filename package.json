@@ -11,7 +11,7 @@
     "type": "git",
     "url": "git://github.com/userdashboard/storage-s3.git"
   },
-  "license": "SPDX(MIT OR Unlicense)",
+  "license": "MIT",
   "scripts": {
     "start": "node main.js",
     "test": "NODE_ENV=testing mocha node_modules/@userdashboard/dashboard/src --recursive --timeout 480000 --slow 480000"
