@@ -111,6 +111,9 @@ async function write (file, contents) {
     Key: `${storagePath}/${file}`,
     Body: contents.toString()
   }
+  if (process.env.NODE_ENV === 'testing') {
+    console.log('write', file, contents)
+  }
   await s3.putObject(params).promise()
 }
 
