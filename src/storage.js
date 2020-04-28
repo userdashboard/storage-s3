@@ -7,11 +7,12 @@ if (process.env.S3_ENDPOINT) {
   const s3EndPoint = new AWS.Endpoint(process.env.S3_ENDPOINT)
   config.endpoint = s3EndPoint
 }
-if (process.env.NODE_ENV === 'testing') {
-  console.log('config', config)
-}
 AWS.config.update(config)
-const s3 = new AWS.S3()
+const s3Options = {}
+if (process.env.NODE_ENV === 'testing') {
+  s3Options.s3ForcePathStyle = true
+}
+const s3 = new AWS.S3(s3Options)
 
 const storagePath = process.env.STORAGE_PATH || '/data'
 
@@ -52,11 +53,9 @@ if (process.env.NODE_ENV === 'testing') {
   let created = false
   module.exports.flush = async () => {
     if (!created) {
-      console.log('create bucket', process.env.S3_BUCKET_NAME)
       await s3.createBucket({ Bucket: process.env.S3_BUCKET_NAME }).promise()
       created = true
     }
-    console.log('delete contents')
     await emptyS3Directory(process.env.S3_BUCKET_NAME, storagePath)
   }
 }
