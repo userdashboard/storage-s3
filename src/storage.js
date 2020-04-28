@@ -144,6 +144,9 @@ async function read (file) {
   } catch (error) {
     throw new Error('invalid-file')
   }
+  if (object.substring) {
+    object = JSON.parse(object)
+  }
   return object.Body.toString()
 }
 
@@ -162,6 +165,9 @@ async function readMany (prefix, files) {
       object = await s3.getObject(params).promise()
     } catch (error) {
       throw new Error('invalid-file')
+    }
+    if (object.substring) {
+      object = JSON.parse(object)
     }
     data[file] = object.Body.toString()
   }
@@ -182,6 +188,9 @@ async function readImage (file) {
   } catch (error) {
     throw new Error('invalid-file')
   }
+  if (object.substring) {
+    object = JSON.parse(object)
+  }
   return object.Body
 }
 
@@ -199,8 +208,8 @@ async function list (path) {
       console.log(error)
     }
   }
-  if (process.env.NODE_ENV) {
-    console.log(data, data.objects, data.objects.length)
+  if (data.substring) {
+    data = JSON.parse(data)
   }
   if (data && data.Contents && data.Contents.length) {
     const files = []
