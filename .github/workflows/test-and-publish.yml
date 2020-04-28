@@ -27,8 +27,8 @@ jobs:
         cd dashboard
         npm install mocha puppeteer@2.1.1 --no-save
         mkdir -p node_modules/@userdashboard/storage-s3
-        cp index.js node_modules/@userdashboard/storage-s3
-        cp -R src node_modules/@userdashboard/storage-s3
+        cp ../index.js node_modules/@userdashboard/storage-s3
+        cp -R ../src node_modules/@userdashboard/storage-s3
     - name: Test unencrypted S3-compatible storage
       run: cd dashboard && npm test
       env:
