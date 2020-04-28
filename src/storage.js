@@ -42,9 +42,6 @@ async function emptyS3Directory (bucket, prefix) {
     Delete: { Objects: [] }
   }
   await s3.deleteObjects(deleteParams).promise()
-  if (listedObjects.IsTruncated) {
-    await emptyS3Directory(bucket, prefix)
-  }
 }
 
 if (process.env.NODE_ENV === 'testing') {
@@ -145,7 +142,11 @@ async function read (file) {
     throw new Error('invalid-file')
   }
   if (object.substring) {
-    object = JSON.parse(object)
+    try {
+      object = JSON.parse(object)
+    } catch (error) {
+      console.log(error, object)
+    }
   }
   return object.Body.toString()
 }
@@ -167,7 +168,11 @@ async function readMany (prefix, files) {
       throw new Error('invalid-file')
     }
     if (object.substring) {
-      object = JSON.parse(object)
+      try {
+        object = JSON.parse(object)
+      } catch (error) {
+        console.log(error, object)
+      }
     }
     data[file] = object.Body.toString()
   }
@@ -189,7 +194,11 @@ async function readImage (file) {
     throw new Error('invalid-file')
   }
   if (object.substring) {
-    object = JSON.parse(object)
+    try {
+      object = JSON.parse(object)
+    } catch (error) {
+      console.log(error, object)
+    }
   }
   return object.Body
 }
@@ -209,7 +218,11 @@ async function list (path) {
     }
   }
   if (data.substring) {
-    data = JSON.parse(data)
+    try {
+      data = JSON.parse(data)
+    } catch (error) {
+      console.log(error, data)
+    }
   }
   if (data && data.Contents && data.Contents.length) {
     const files = []
