@@ -29,6 +29,7 @@ module.exports = {
 
 async function emptyS3Directory (bucket, prefix) {
   const listParams = {
+    MaxKeys: 2147483647,
     Bucket: bucket,
     Prefix: prefix
   }
@@ -40,9 +41,6 @@ async function emptyS3Directory (bucket, prefix) {
     Bucket: bucket,
     Delete: { Objects: [] }
   }
-  listedObjects.Contents.forEach(({ Key }) => {
-    deleteParams.Delete.Objects.push({ Key })
-  })
   await s3.deleteObjects(deleteParams).promise()
   if (listedObjects.IsTruncated) {
     await emptyS3Directory(bucket, prefix)
@@ -202,7 +200,7 @@ async function list (path) {
     }
   }
   if (process.env.NODE_ENV) {
-    console.log(data)
+    console.log(data, data.objects, data.objects.length
   }
   if (data && data.Contents && data.Contents.length) {
     const files = []
