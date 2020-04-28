@@ -49,9 +49,11 @@ if (process.env.NODE_ENV === 'testing') {
   let created = false
   module.exports.flush = async () => {
     if (!created) {
+      console.log('create bucket')
       await s3.createBucket({ Bucket: process.env.S3_BUCKET_NAME }).promise()
       created = true
     }
+    console.log('delete contents')
     await emptyS3Directory(process.env.S3_BUCKET_NAME, storagePath)
   }
 }
