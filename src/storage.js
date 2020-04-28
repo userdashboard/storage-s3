@@ -23,10 +23,10 @@ module.exports = {
   deleteFile
 }
 
-async function emptyS3Directory (bucket, dir) {
+async function emptyS3Directory (bucket, prefix) {
   const listParams = {
     Bucket: bucket,
-    Prefix: dir
+    Prefix: prefix
   }
   const listedObjects = await s3.listObjectsV2(listParams).promise()
   if (listedObjects.Contents.length === 0) {
@@ -41,7 +41,7 @@ async function emptyS3Directory (bucket, dir) {
   })
   await s3.deleteObjects(deleteParams).promise()
   if (listedObjects.IsTruncated) {
-    await emptyS3Directory(bucket, dir)
+    await emptyS3Directory(bucket, prefix)
   }
 }
 
