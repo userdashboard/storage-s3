@@ -25,11 +25,11 @@ jobs:
       run: |
         git clone https://github.com/userdashboard/dashboard.git dashboard
         cd dashboard
-        npm install mocha puppeteer@2.1.1 --no-save
+        npm install aws-sdk mocha puppeteer@2.1.1 --no-save
         mkdir -p node_modules/@userdashboard/storage-s3
         cp ../index.js node_modules/@userdashboard/storage-s3
         cp -R ../src node_modules/@userdashboard/storage-s3
-    - name: Test unencrypted S3-compatible storage
+    - name: Test without encryption
       run: cd dashboard && npm test
       env:
         NODE_ENV: testing
