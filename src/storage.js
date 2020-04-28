@@ -52,7 +52,7 @@ if (process.env.NODE_ENV === 'testing') {
       await s3.createBucket({ Bucket: process.env.S3_BUCKET_NAME })
       created = true
     }
-    await emptyS3Directory(process.env.S3_BUCKET_NAME, '/')
+    await emptyS3Directory(process.env.S3_BUCKET_NAME, storagePath)
   }
 }
 
