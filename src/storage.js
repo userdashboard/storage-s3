@@ -197,6 +197,12 @@ async function list (path) {
   try {
     data = await s3.listObjectsV2(params).promise()
   } catch (error) {
+    if (process.env.NODE_ENV) {
+      console.log(error)
+    }
+  }
+  if (process.env.NODE_ENV) {
+    console.log(data)
   }
   if (data && data.Contents && data.Contents.length) {
     const files = []
