@@ -4,8 +4,11 @@ const config = {
   secretAccessKey: process.env.SECRET_ACCESS_KEY
 }
 if (process.env.S3_ENDPOINT) {
-  const spacesEndpoint = new AWS.Endpoint(process.env.S3_ENDPOINT)
-  config.endpoint = spacesEndpoint
+  const s3EndPoint = new AWS.Endpoint(process.env.S3_ENDPOINT)
+  config.endpoint = s3EndPoint
+}
+if (process.env.NODE_ENV === 'testing') {
+  console.log('config', config)
 }
 AWS.config.update(config)
 const s3 = new AWS.S3()
@@ -49,7 +52,7 @@ if (process.env.NODE_ENV === 'testing') {
   let created = false
   module.exports.flush = async () => {
     if (!created) {
-      console.log('create bucket', process.env.S3_BUCKET_NAME )
+      console.log('create bucket', process.env.S3_BUCKET_NAME)
       await s3.createBucket({ Bucket: process.env.S3_BUCKET_NAME }).promise()
       created = true
     }
