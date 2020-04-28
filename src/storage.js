@@ -3,14 +3,13 @@ const config = {
   accessKeyId: process.env.ACCESS_KEY_ID,
   secretAccessKey: process.env.SECRET_ACCESS_KEY
 }
-
 if (process.env.S3_ENDPOINT) {
   const spacesEndpoint = new AWS.Endpoint(process.env.S3_ENDPOINT)
   config.endpoint = spacesEndpoint
 }
-
 AWS.config.update(config)
 const s3 = new AWS.S3()
+
 const storagePath = process.env.STORAGE_PATH || '/data'
 
 module.exports = {
@@ -22,6 +21,34 @@ module.exports = {
   write,
   writeImage,
   deleteFile
+}
+
+async function emptyS3Directory (bucket, dir) {
+  const listParams = {
+    Bucket: bucket,
+    Prefix: dir
+  }
+  const listedObjects = await s3.listObjectsV2(listParams).promise()
+  if (listedObjects.Contents.length === 0) {
+    return
+  }
+  const deleteParams = {
+    Bucket: bucket,
+    Delete: { Objects: [] }
+  }
+  listedObjects.Contents.forEach(({ Key }) => {
+    deleteParams.Delete.Objects.push({ Key })
+  })
+  await s3.deleteObjects(deleteParams).promise()
+  if (listedObjects.IsTruncated) {
+    await emptyS3Directory(bucket, dir)
+  }
+}
+
+if (process.env.NODE_ENV === 'testing') {
+  module.exports.flush = async () => {
+    await emptyS3Directory(process.env.S3_BUCKET_NAME, '/')
+  }
 }
 
 async function exists (file) {
