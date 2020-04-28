@@ -34,6 +34,7 @@ async function emptyS3Directory (bucket, prefix) {
     Prefix: prefix
   }
   const listedObjects = await s3.listObjectsV2(listParams).promise()
+  console.log('deleting', listedObjects)
   if (listedObjects.Contents.length === 0) {
     return
   }
