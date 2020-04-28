@@ -200,7 +200,7 @@ async function list (path) {
     }
   }
   if (process.env.NODE_ENV) {
-    console.log(data, data.objects, data.objects.length
+    console.log(data, data.objects, data.objects.length)
   }
   if (data && data.Contents && data.Contents.length) {
     const files = []
