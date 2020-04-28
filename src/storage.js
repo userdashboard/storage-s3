@@ -46,8 +46,12 @@ async function emptyS3Directory (bucket, dir) {
 }
 
 if (process.env.NODE_ENV === 'testing') {
+  let created = false
   module.exports.flush = async () => {
-    await s3.createBucket(process.env.S3_BUCKET_NAME)
+    if (!created) {
+      await s3.createBucket(process.env.S3_BUCKET_NAME)
+      created = true
+    }
     await emptyS3Directory(process.env.S3_BUCKET_NAME, '/')
   }
 }
