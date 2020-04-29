@@ -82,16 +82,13 @@ async function exists (file) {
   return found
 }
 
-async function deleteFile (path) {
-  if (!path) {
-    throw new Error('invalid-file')
-  }
-  if (path.indexOf('/') === path.length - 1) {
+async function deleteFile (file) {
+  if (!file) {
     throw new Error('invalid-file')
   }
   const params = {
     Bucket: process.env.S3_BUCKET_NAME,
-    Key: `${storagePath}/${path}`
+    Key: `${storagePath}/${file}`
   }
   try {
     await s3.deleteObject(params).promise()

@@ -21,42 +21,11 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - name: Setup Dashboard
-      run: |
-        git clone https://github.com/userdashboard/dashboard.git dashboard
-        cd dashboard
-        npm install aws-sdk mocha puppeteer@2.1.1 --no-save
-        mkdir -p node_modules/@userdashboard/storage-s3
-        cp ../index.js node_modules/@userdashboard/storage-s3
-        cp -R ../src node_modules/@userdashboard/storage-s3
     - name: Test without encryption
-      run: cd dashboard && npm test
-      env:
-        NODE_ENV: testing
-        FAST_START: true
-        DASHBOARD_SERVER: "http://localhost:9000"
-        DOMAIN: "localhost"
-        STORAGE_ENGINE: "@userdashboard/storage-s3"
-        S3_ENDPOINT: "http://localhost:4566"
-        S3_BUCKET_NAME: "testing"
-        SECRET_ACCESS_KEY: "using-mock-aws-s3"
-        ACCESS_KEY_ID: "using-mock-aws-s3"
-        GENERATE_SITEMAP_TXT: false
-        GENERATE_API_TXT: false
+      run: bash test.sh
     - name: Test with encryption
-      run: cd dashboard && npm test
+      run: bash test.sh
       env:
-        NODE_ENV: testing
-        FAST_START: true
-        DASHBOARD_SERVER: "http://localhost:9000"
-        DOMAIN: "localhost"
-        STORAGE_ENGINE: "@userdashboard/storage-s3"
-        S3_ENDPOINT: "http://localhost:4566"
-        S3_BUCKET_NAME: "testing"
-        SECRET_ACCESS_KEY: "using-mock-aws-s3"
-        ACCESS_KEY_ID: "using-mock-aws-s3"
-        GENERATE_SITEMAP_TXT: false
-        GENERATE_API_TXT: false
         ENCRYPTION_SECRET: "12345678901234567890123456789012"
         ENCRYPTION_SECRET_IV: "1234123412341234"
     - name: Publish to NPM
