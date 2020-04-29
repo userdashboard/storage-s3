@@ -49,12 +49,10 @@ async function list (path, offset, pageSize) {
     throw new Error('invalid-offset')
   }
   let list = await Storage.list(`list/${path}`)
-  console.log('got list', list)
   if (!list || !list.length) {
     return null
   }
   if (offset) {
-    console.log('splice to offset')
     list.splice(0, offset)
   }
   if (list.length > pageSize) {
@@ -63,7 +61,6 @@ async function list (path, offset, pageSize) {
   for (const i in list) {
     list[i] = list[i].split('/').pop()
   }
-  console.log('returning', list)
   return list
 }
 

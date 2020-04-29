@@ -150,13 +150,6 @@ async function read (file) {
   } catch (error) {
     throw new Error('invalid-file')
   }
-  if (object.substring) {
-    try {
-      object = JSON.parse(object)
-    } catch (error) {
-      console.log(error, object)
-    }
-  }
   return object.Body.toString()
 }
 
@@ -175,13 +168,6 @@ async function readMany (prefix, files) {
       object = await s3.getObject(params).promise()
     } catch (error) {
       throw new Error('invalid-file')
-    }
-    if (object.substring) {
-      try {
-        object = JSON.parse(object)
-      } catch (error) {
-        console.log(error, object)
-      }
     }
     data[file] = object.Body.toString()
   }
@@ -202,13 +188,6 @@ async function readImage (file) {
   } catch (error) {
     throw new Error('invalid-file')
   }
-  if (object.substring) {
-    try {
-      object = JSON.parse(object)
-    } catch (error) {
-      console.log(error, object)
-    }
-  }
   return object.Body
 }
 
@@ -226,20 +205,11 @@ async function list (path) {
       console.log(error)
     }
   }
-  if (data.substring) {
-    try {
-      data = JSON.parse(data)
-    } catch (error) {
-      console.log(error, data)
-    }
-  }
-  console.log('list data', path, data)
   if (data && data.Contents && data.Contents.length) {
     const files = []
     for (const item of data.Contents) {
       files.push(item.Key.substring(storagePath.length + 1))
     }
-    console.log('returning files', files)
     return files
   }
   return null
