@@ -217,7 +217,7 @@ async function list (path) {
   }
   if (data && data.Contents && data.Contents.length) {
     data.Contents.sort((a, b) => {
-      return a.LastModified > b.LastModified ? 1 : -1
+      return a.LastModified < b.LastModified ? 1 : -1
     })
     const files = []
     for (const item of data.Contents) {
