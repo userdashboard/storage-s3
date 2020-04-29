@@ -205,10 +205,16 @@ async function list (path) {
       console.log(error)
     }
   }
+  if (process.env.NODE_ENV === 'testing') {
+    console.log('data', data)
+  }
   if (data && data.Contents && data.Contents.length) {
     const files = []
     for (const item of data.Contents) {
       files.push(item.Key.substring(storagePath.length + 1))
+    }
+    if (process.env.NODE_ENV === 'testing') {
+      console.log('returning', files)
     }
     return files
   }
