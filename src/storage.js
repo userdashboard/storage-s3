@@ -239,6 +239,7 @@ async function list (path) {
     for (const item of data.Contents) {
       files.push(item.Key.substring(storagePath.length + 1))
     }
+    console.log('returning files', files)
     return files
   }
   return null
