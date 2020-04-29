@@ -96,6 +96,9 @@ async function deleteFile (path) {
   try {
     await s3.deleteObject(params).promise()
   } catch (error) {
+    if (process.env.DEBUG_ERRORS) {
+      console.log('[s3-storage]', error)
+    }
     throw new Error('invalid-file')
   }
 }
@@ -114,9 +117,6 @@ async function write (file, contents) {
     Bucket: process.env.S3_BUCKET_NAME,
     Key: `${storagePath}/${file}`,
     Body: contents.toString()
-  }
-  if (process.env.NODE_ENV === 'testing') {
-    console.log('write', file, contents)
   }
   await s3.putObject(params).promise()
 }
@@ -148,6 +148,9 @@ async function read (file) {
   try {
     object = await s3.getObject(params).promise()
   } catch (error) {
+    if (process.env.DEBUG_ERRORS) {
+      console.log('[s3-storage]', error)
+    }
     throw new Error('invalid-file')
   }
   return object.Body.toString()
@@ -167,6 +170,9 @@ async function readMany (prefix, files) {
     try {
       object = await s3.getObject(params).promise()
     } catch (error) {
+      if (process.env.DEBUG_ERRORS) {
+        console.log('[s3-storage]', error)
+      }
       throw new Error('invalid-file')
     }
     data[file] = object.Body.toString()
@@ -186,7 +192,10 @@ async function readImage (file) {
   try {
     object = await s3.getObject(params).promise()
   } catch (error) {
-    throw new Error('invalid-file')
+    if (process.env.DEBUG_ERRORS) {
+      console.log('[s3-storage]', error)
+    }
+    throw new Error('unknown-error')
   }
   return object.Body
 }
@@ -201,20 +210,18 @@ async function list (path) {
   try {
     data = await s3.listObjectsV2(params).promise()
   } catch (error) {
-    if (process.env.NODE_ENV) {
-      console.log(error)
+    if (process.env.DEBUG_ERRORS) {
+      console.log('[s3-storage]', error)
     }
-  }
-  if (process.env.NODE_ENV === 'testing') {
-    console.log('data', data)
+    throw new Error('unknown-error')
   }
   if (data && data.Contents && data.Contents.length) {
+    data.Contents.sort((a, b) => {
+      return a.LastModified > b.LastModified ? 1 : -1
+    })
     const files = []
     for (const item of data.Contents) {
       files.push(item.Key.substring(storagePath.length + 1))
-    }
-    if (process.env.NODE_ENV === 'testing') {
-      console.log('returning', files)
     }
     return files
   }
