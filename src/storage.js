@@ -34,12 +34,10 @@ async function emptyS3Directory (bucket, prefix) {
     Prefix: prefix
   }
   let listedObjects = await s3.listObjectsV2(listParams).promise()
-  console.log('deleting', listedObjects)
   if (listedObjects.substring) {
     try {
       listedObjects = JSON.parse(listedObjects)
     } catch (error) {
-      console.log(error, listedObjects)
     }
   }
   if (listedObjects.Contents.length === 0) {
@@ -49,11 +47,9 @@ async function emptyS3Directory (bucket, prefix) {
     Bucket: bucket,
     Delete: { Objects: [] }
   }
-  console.log('adding objets to delete', listedObjects.Contents)
   for (const object of listedObjects.Contents) {
     deleteParams.Delete.Objects.push({ Key: object.Key })
   }
-  console.log('deleting', deleteParams)
   await s3.deleteObjects(deleteParams).promise()
 }
 
@@ -237,6 +233,7 @@ async function list (path) {
       console.log(error, data)
     }
   }
+  console.log('list data', path, data)
   if (data && data.Contents && data.Contents.length) {
     const files = []
     for (const item of data.Contents) {
