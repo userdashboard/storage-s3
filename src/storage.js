@@ -49,8 +49,7 @@ async function emptyS3Directory (bucket, prefix) {
     Bucket: bucket,
     Delete: { Objects: [] }
   }
-  for (const i in listedObjects.Contents) {
-    const object = listedObjects.Contents[i]
+  for (const object of listedObjects.Contents) {
     deleteParams.Delete.Objects.push(object.Key)
   }
   await s3.deleteObjects(deleteParams).promise()
