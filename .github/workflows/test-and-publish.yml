@@ -26,9 +26,11 @@ jobs:
         git clone https://github.com/userdashboard/dashboard.git /tmp/instance
         cd /tmp/instance
         npm install aws-sdk mocha puppeteer@2.1.1 --no-save
-        mkdir -p node_modules/@userdashboard/storage-s3
-        cp ../index.js node_modules/@userdashboard/storage-s3
-        cp -R ../src node_modules/@userdashboard/storage-s3
+    - name: Fake-install module
+      run: |
+        mkdir -p /tmp/instancenode_modules/@userdashboard/storage-s3
+        cp index.js /tmp/instancenode_modules/@userdashboard/storage-s3
+        cp -R src /tmp/instancenode_modules/@userdashboard/storage-s3
     - name: Test without encryption
       run: cd /tmp/instance && npm test
       env:
