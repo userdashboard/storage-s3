@@ -1,4 +1,5 @@
 # S3 Storage for Dashboard
+![Test suite status](https://github.com/userdashboard/storage-s3/workflows/test-and-publish/badge.svg?branch=master)
 
 Install this module to use [Amazon S3](https://aws.amazon.com/s3) for data storage.
 
@@ -13,9 +14,9 @@ To use with S3-equivalent services such as [Digital Ocean\'s spaces]() requires 
 
     S3_ENDPOINT=nyc3.digitaloceanspaces.com
 
-To test this module use [Dashboard](https://github.com/userdashboard/dashboard)'s test suite configured with this storage engine.
+## Testing
 
-
+This module is tested using [Dashboard](https://github.com/userdashboard/dashboard)'s test suite configured with this storage engine.
 
 # Dashboard
 
