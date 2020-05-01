@@ -17,11 +17,10 @@ jobs:
           - 4566:4566
     steps:
     - uses: actions/checkout@v1
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
+    - uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - name: Setup dependencies
+    - name: Install dependencies
       run: |
         git clone https://github.com/userdashboard/dashboard.git /tmp/instance
         cd /tmp/instance
@@ -31,7 +30,7 @@ jobs:
         mkdir -p /tmp/instance/node_modules/@userdashboard/storage-s3
         cp index.js /tmp/instance/node_modules/@userdashboard/storage-s3
         cp -R src /tmp/instance/node_modules/@userdashboard/storage-s3
-    - name: Test without encryption
+    - name: Test unencrypted S3-compatible storage
       run: cd /tmp/instance && npm test
       env:
         NODE_ENV: "testing"
@@ -45,7 +44,7 @@ jobs:
         ACCESS_KEY_ID: "using-mock-aws-s3"
         GENERATE_SITEMAP_TXT: "false"
         GENERATE_API_TXT: "false"
-    - name: Test with encryption
+    - name: Test encrypted S3-compatible storage
       run: cd /tmp/instance && npm test
       env:
         NODE_ENV: testing
