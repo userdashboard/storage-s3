@@ -5,7 +5,7 @@ Install this module to use [Amazon S3](https://aws.amazon.com/s3) for data stora
 
 You will need to launch with additional configuration variables:
 
-    STORAGE_ENGINE=@userdashboard/storage-s3
+    STORAGE=@userdashboard/storage-s3
     S3_BUCKET_NAME=the_name
     ACCESS_KEY_ID=secret from amazon
     SECRET_ACCESS_KEY=secret from amazon
@@ -13,6 +13,14 @@ You will need to launch with additional configuration variables:
 To use with S3-equivalent services such as [Digital Ocean\'s spaces]() requires more:
 
     S3_ENDPOINT=nyc3.digitaloceanspaces.com
+
+You can use this storage for a module:
+
+    MODULE_NAME_STORAGE=@userdashboard/storage-s3
+    MODULE_NAME_S3_BUCKET_NAME=the_name
+    MODULE_NAME_ACCESS_KEY_ID=secret from amazon
+    MODULE_NAME_SECRET_ACCESS_KEY=secret from amazon
+    MODULE_NAME_S3_ENDPOINT=nyc3.digitaloceanspaces.com
 
 ## Testing
 
