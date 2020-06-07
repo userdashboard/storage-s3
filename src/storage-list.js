@@ -2,11 +2,12 @@ module.exports = {
   setup: async (storage) => {
     const container = {
       add: async (path, itemid) => {
-        const exists = await storage.exists(`list/${path}/${itemid}`)
-        if (exists) {
-          return
-        }
         return storage.write(`list/${path}/${itemid}`, '')
+      },
+      addMany: async (items) => {
+        for (const path in items) {
+          return storage.write(`list/${path}/${items[path]}`, '')
+        }
       },
       count: async (path) => {
         const all = await storage.list(`list/${path}`)
