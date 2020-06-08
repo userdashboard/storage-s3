@@ -44,6 +44,7 @@ jobs:
         ACCESS_KEY_ID: "using-mock-aws-s3"
         GENERATE_SITEMAP_TXT: "false"
         GENERATE_API_TXT: "false"
+        LOG_LEVEL: "info,warn,debug,log"
     - name: Test encrypted S3-compatible storage
       run: cd /tmp/instance && npm test
       env:
