@@ -113,13 +113,19 @@ module.exports = {
           MaxKeys: 2147483647,
           Prefix: `${storagePath}/list/${path}`
         }
-        return storage.s3.listObjectsV2(params, (error, data) => {
+        return storage.s3.listObjectsV2(params, (error, listedObjects) => {
           if (error) {
             Log.error('error listing', error)
             return callback(new Error('unknown-error'))
           }
-          if (data && data.Contents && data.Contents.length) {
-            let list = data.Contents
+          if (listedObjects.substring) {
+            try {
+              listedObjects = JSON.parse(listedObjects)
+            } catch (error) {
+            }
+          }
+          if (listedObjects && listedObjects.Contents && listedObjects.Contents.length) {
+            let list = listedObjects.Contents
             if (offset) {
               list.splice(0, offset)
             }
@@ -140,13 +146,19 @@ module.exports = {
           MaxKeys: 2147483647,
           Prefix: `${storagePath}/list/${path}`
         }
-        return storage.s3.listObjectsV2(params, (error, data) => {
+        return storage.s3.listObjectsV2(params, (error, listedObjects) => {
           if (error) {
             Log.error('error listing', error)
             return callback(new Error('unknown-error'))
           }
-          if (data && data.Contents && data.Contents.length) {
-            const list = data.Contents
+          if (listedObjects.substring) {
+            try {
+              listedObjects = JSON.parse(listedObjects)
+            } catch (error) {
+            }
+          }
+          if (listedObjects && listedObjects.Contents && listedObjects.Contents.length) {
+            const list = listedObjects.Contents
             for (const i in list) {
               list[i] = list[i].split('/').pop()
             }
