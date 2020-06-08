@@ -1,6 +1,21 @@
+const fs = require('fs')
+const path = require('path')
+const util = require('util')
 
 module.exports = {
-  setup: async (moduleName) => {
+  setup: util.promisify((moduleName, callback) => {
+    if (!callback) {
+      callback = moduleName
+      moduleName = null
+    }
+    let Log
+    const dashboardPath1 = path.join(global.applicationPath, 'node_modules/@userdashboard/dashboard/src/log.js')
+    if (fs.existsSync(dashboardPath1)) {
+      Log = require(dashboardPath1)('postgresql-list')
+    } else {
+      const dashboardPath2 = path.join(global.applicationPath, 'src/log.js')
+      Log = require(dashboardPath2)('postgresql-list')
+    }
     const accessKeyId = process.env[`${moduleName}_ACCESS_KEY_ID`] || process.env.ACCESS_KEY_ID
     const secretAccessKey = process.env[`${moduleName}_SECRET_ACCESS_KEY`] || process.env.SECRET_ACCESS_KEY
     const bucketName = process.env[`${moduleName}_S3_BUCKET_NAME`] || process.env.S3_BUCKET_NAME
@@ -18,117 +33,109 @@ module.exports = {
     }
     const s3 = new AWS.S3(s3Options)
     const container = {
-      exists: async (file) => {
+      exists: util.promisify((file, callback) => {
         if (!file) {
-          throw new Error('invalid-file')
+          return callback(new Error('invalid-file'))
         }
         const params = {
           Bucket: bucketName,
           Key: `${storagePath}/${file}`
         }
-        let found
-        try {
-          await s3.headObject(params).promise()
-          found = true
-        } catch (error) {
-          found = false
-        }
-        return found
-      },
-      list: async (path) => {
+        return s3.headObject(params, (error, found) => {
+          if (error) {
+            Log.error('error checking exists', error)
+            return callback(new Error('unknown-error'))
+          }
+          return callback(null, found !== null && found !== undefined)
+        })
+      }),
+      list: util.promisify((path, callback) => {
         const params = {
           Bucket: bucketName,
           MaxKeys: 2147483647,
           Prefix: `${storagePath}/${path}`
         }
-        let data
-        try {
-          data = await s3.listObjectsV2(params).promise()
-        } catch (error) {
-          if (process.env.DEBUG_ERRORS) {
-            console.log('[s3-storage]', error)
+        return s3.listObjectsV2(params, (error, data) => {
+          if (error) {
+            Log.error('error listing', error)
+            return callback(new Error('unknown-error'))
           }
-          throw new Error('unknown-error')
-        }
-        if (data && data.Contents && data.Contents.length) {
-          data.Contents.sort((a, b) => {
-            return a.LastModified < b.LastModified ? 1 : -1
-          })
-          const files = []
-          for (const item of data.Contents) {
-            files.push(item.Key.substring(storagePath.length + 1))
+          if (data && data.Contents && data.Contents.length) {
+            data.Contents.sort((a, b) => {
+              return a.LastModified < b.LastModified ? 1 : -1
+            })
+            const files = []
+            for (const item of data.Contents) {
+              files.push(item.Key.substring(storagePath.length + 1))
+            }
+            return files
           }
-          return files
-        }
-        return null
-      },
-      read: async (file) => {
+          return null
+        })
+      }),
+      read: util.promisify((file, callback) => {
         if (!file) {
-          throw new Error('invalid-file')
+          return callback(new Error('invalid-file'))
         }
         const params = {
           Bucket: bucketName,
           Key: `${storagePath}/${file}`
         }
-        let object
-        try {
-          object = await s3.getObject(params).promise()
-        } catch (error) {
-          if (process.env.DEBUG_ERRORS) {
-            console.log('[s3-storage]', error)
+        return s3.getObject(params, (error, object) => {
+          if (error) {
+            Log.error('error reading', error)
+            return callback(new Error('invalid-file'))
           }
-          throw new Error('invalid-file')
-        }
-        return object.Body.toString()
-      },
-      readMany: async (prefix, files) => {
+          return callback(null, object.Body.toString())
+        })
+      }),
+      readMany: util.promisify((prefix, files, callback) => {
         if (!files || !files.length) {
-          throw new Error('invalid-files')
+          return callback(new Error('invalid-files'))
         }
         const params = {
           Bucket: bucketName
         }
         const data = {}
-        for (const file of files) {
-          params.Key = `${storagePath}/${prefix}/${file}`
-          let object
-          try {
-            object = await s3.getObject(params).promise()
-          } catch (error) {
-            if (process.env.DEBUG_ERRORS) {
-              console.log('[s3-storage]', error)
-            }
-            throw new Error('invalid-file')
+        function nextFile () {
+          if (!files.length) {
+            return callback(null, data)
           }
-          data[file] = object.Body.toString()
+          const file = files.shift()
+          params.Key = `${storagePath}/${prefix}/${file}`
+          return s3.getObject(params, (error, object) => {
+            if (error) {
+              Log.error('error reading many', error)
+              return callback(new Error('invalid-file'))
+            }
+            data[file] = object.Body.toString()
+            return nextFile()
+          })
         }
-        return data
-      },
-      readBinary: async (file) => {
+        return nextFile()
+      }),
+      readBinary: util.promisify((file, callback) => {
         if (!file) {
-          throw new Error('invalid-file')
+          return callback(new Error('invalid-file'))
         }
         const params = {
           Bucket: bucketName,
           Key: `${storagePath}/${file}`
         }
-        let object
-        try {
-          object = await s3.getObject(params).promise()
-        } catch (error) {
-          if (process.env.DEBUG_ERRORS) {
-            console.log('[s3-storage]', error)
+        return s3.getObject(params, (error, object) => {
+          if (error) {
+            Log.error('error reading binary', error)
+            return callback(new Error('unknown-error'))
           }
-          throw new Error('unknown-error')
-        }
-        return object.Body
-      },
-      write: async (file, contents) => {
+          return callback(null, object.Body)
+        })
+      }),
+      write: util.promisify((file, contents, callback) => {
         if (!file) {
-          throw new Error('invalid-file')
+          return callback(new Error('invalid-file'))
         }
         if (!contents && contents !== '') {
-          throw new Error('invalid-contents')
+          return callback(new Error('invalid-contents'))
         }
         if (!contents.substring) {
           contents = JSON.stringify(contents)
@@ -138,72 +145,100 @@ module.exports = {
           Key: `${storagePath}/${file}`,
           Body: contents.toString()
         }
-        await s3.putObject(params).promise()
-      },
-      writeBinary: async (file, buffer) => {
+        return s3.putObject(params, (error) => {
+          if (error) {
+            Log.error('error writing', error)
+            return callback(new Error('unknown-error'))
+          }
+          return callback()
+        })
+      }),
+      writeBinary: util.promisify((file, buffer, callback) => {
         if (!file) {
-          throw new Error('invalid-file')
+          return callback(new Error('invalid-file'))
         }
         if (!buffer || !buffer.length) {
-          throw new Error('invalid-buffer')
+          return callback(new Error('invalid-buffer'))
         }
         const params = {
           Bucket: bucketName,
           Key: `${storagePath}/${file}`,
           Body: buffer
         }
-        await s3.putObject(params).promise()
-      },
-      delete: async (file) => {
+        return s3.putObject(params, (error) => {
+          if (error) {
+            Log.error('error writing binary', error)
+            return callback(new Error('unknown-error'))
+          }
+          return callback()
+        })
+      }),
+      delete: util.promisify((file, callback) => {
         if (!file) {
-          throw new Error('invalid-file')
+          return callback(new Error('invalid-file'))
         }
         const params = {
           Bucket: bucketName,
           Key: `${storagePath}/${file}`
         }
-        try {
-          await s3.deleteObject(params).promise()
-        } catch (error) {
-          if (process.env.DEBUG_ERRORS) {
-            console.log('[s3-storage]', error)
+        return s3.deleteObject(params, (error) => {
+          if (error) {
+            Log.error('error deleting', error)
+            return callback(new Error('unknown-error'))
           }
-          throw new Error('invalid-file')
-        }
-      }
+          return callback()
+        })
+      })
     }
     if (process.env.NODE_ENV === 'testing') {
       let created = false
-      container.flush = async () => {
+      container.flush = util.promisify((callback) => {
         if (!created) {
-          await s3.createBucket({ Bucket: bucketName }).promise()
-          created = true
+          return callback()
         }
-        const listParams = {
-          MaxKeys: 2147483647,
-          Bucket: bucketName,
-          Prefix: storagePath
-        }
-        let listedObjects = await s3.listObjectsV2(listParams).promise()
-        if (listedObjects.substring) {
-          try {
-            listedObjects = JSON.parse(listedObjects)
-          } catch (error) {
+        return s3.createBucket({ Bucket: bucketName }, (error) => {
+          if (error) {
+            Log.error('error deleting', error)
+            return callback(new Error('unknown-error'))
           }
-        }
-        if (listedObjects.Contents.length === 0) {
-          return
-        }
-        const deleteParams = {
-          Bucket: bucketName,
-          Delete: { Objects: [] }
-        }
-        for (const object of listedObjects.Contents) {
-          deleteParams.Delete.Objects.push({ Key: object.Key })
-        }
-        await s3.deleteObjects(deleteParams).promise()
-      }
+          created = true
+          const listParams = {
+            MaxKeys: 2147483647,
+            Bucket: bucketName,
+            Prefix: storagePath
+          }
+          return s3.listObjectsV2(listParams, (error, listedObjects) => {
+            if (error) {
+              Log.error('error deleting', error)
+              return callback(new Error('unknown-error'))
+            }
+            if (listedObjects.substring) {
+              try {
+                listedObjects = JSON.parse(listedObjects)
+              } catch (error) {
+              }
+            }
+            if (listedObjects.Contents.length === 0) {
+              return callback()
+            }
+            const deleteParams = {
+              Bucket: bucketName,
+              Delete: { Objects: [] }
+            }
+            for (const object of listedObjects.Contents) {
+              deleteParams.Delete.Objects.push({ Key: object.Key })
+            }
+            return s3.deleteObjects(deleteParams, (error) => {
+              if (error) {
+                Log.error('error deleting', error)
+                return callback(new Error('unknown-error'))
+              }
+              return callback()
+            })
+          })
+        })
+      })
     }
-    return container
-  }
+    return callback(null, container)
+  })
 }
