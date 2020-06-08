@@ -125,12 +125,12 @@ module.exports = {
             }
           }
           if (listedObjects && listedObjects.Contents && listedObjects.Contents.length) {
-            let list = listedObjects.Contents
+            const list = listedObjects.Contents
             if (offset) {
               list.splice(0, offset)
             }
             if (list.length > pageSize) {
-              list = list.slice(0, pageSize)
+              list.length = pageSize
             }
             for (const i in list) {
               list[i] = list[i].split('/').pop()
