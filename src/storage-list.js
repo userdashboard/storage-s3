@@ -13,6 +13,8 @@ module.exports = {
         storage = null
       }
     }
+    const bucketName = process.env[`${moduleName}_S3_BUCKET_NAME`] || process.env.S3_BUCKET_NAME
+    const storagePath = process.env[`${moduleName}_STORAGE_PATH`] || process.env.STORAGE_PATH || '/data'
     const dashboardPath1 = path.join(global.applicationPath, 'node_modules/@userdashboard/dashboard/src/log.js')
     let Log
     if (fs.existsSync(dashboardPath1)) {
@@ -23,9 +25,14 @@ module.exports = {
     }
     const container = {
       add: util.promisify((path, itemid, callback) => {
-        return storage.write(`list/${path}/${itemid}`, '', (error) => {
+        const params = {
+          Bucket: bucketName,
+          Key: `${storagePath}/list/${path}/${itemid}`,
+          Body: ''
+        }
+        return storage.s3.putObject(params, (error) => {
           if (error) {
-            Log.error('error adding item', error)
+            Log.error('error writing', error)
             return callback(new Error('unknown-error'))
           }
           return callback()
@@ -38,35 +45,50 @@ module.exports = {
             return callback()
           }
           const path = keys.shift()
-          return storage.write(`list/${path}/${items[path]}`, '', (error) => {
+
+          const params = {
+            Bucket: bucketName,
+            Key: `${storagePath}/list/${path}/${items[path]}`,
+            Body: ''
+          }
+          return storage.s3.putObject(params, (error) => {
             if (error) {
-              Log.error('error adding many', error)
+              Log.error('error writing', error)
               return callback(new Error('unknown-error'))
             }
-            return nextItem()
+            return callback()
           })
         }
         return nextItem()
       }),
       count: util.promisify((path, callback) => {
-        return storage.list(`list/${path}`, (error, all) => {
+        const params = {
+          Bucket: bucketName,
+          MaxKeys: 2147483647,
+          Prefix: `${storagePath}/list/${path}`
+        }
+        return storage.s3.listObjectsV2(params, (error, data) => {
           if (error) {
-            Log.error('error adding item', error)
+            Log.error('error listing', error)
             return callback(new Error('unknown-error'))
           }
-          if (!all || !all.length) {
-            return 0
+          if (data && data.Contents && data.Contents.length) {
+            return callback(null, data.Contents.length)
           }
-          return callback(null, all.length)
+          return callback(null, 0)
         })
       }),
       exists: util.promisify((path, itemid, callback) => {
-        return storage.exists(`list/${path}/${itemid}`, (error, exists) => {
-          if (error) {
-            Log.error('error adding item', error)
+        const params = {
+          Bucket: bucketName,
+          Key: `${storagePath}/list/${path}/${itemid}`
+        }
+        return storage.s3.headObject(params, (error, found) => {
+          if (error && error.code !== 'NotFound') {
+            Log.error('error checking exists', error)
             return callback(new Error('unknown-error'))
           }
-          return callback(null, exists)
+          return callback(null, found !== null && found !== undefined)
         })
       }),
       list: util.promisify((path, offset, pageSize, callback) => {
@@ -86,45 +108,61 @@ module.exports = {
         if (offset < 0) {
           return callback(new Error('invalid-offset'))
         }
-        return storage.list(`list/${path}`, (error, list) => {
+        const params = {
+          Bucket: bucketName,
+          MaxKeys: 2147483647,
+          Prefix: `${storagePath}/list/${path}`
+        }
+        return storage.s3.listObjectsV2(params, (error, data) => {
           if (error) {
-            Log.error('error adding item', error)
+            Log.error('error listing', error)
             return callback(new Error('unknown-error'))
           }
-          if (!list || !list.length) {
-            return null
+          if (data && data.Contents && data.Contents.length) {
+            let list = data.Contents
+            if (offset) {
+              list.splice(0, offset)
+            }
+            if (list.length > pageSize) {
+              list = list.slice(0, pageSize)
+            }
+            for (const i in list) {
+              list[i] = list[i].split('/').pop()
+            }
+            return callback(null, list)
           }
-          if (offset) {
-            list.splice(0, offset)
-          }
-          if (list.length > pageSize) {
-            list = list.slice(0, pageSize)
-          }
-          for (const i in list) {
-            list[i] = list[i].split('/').pop()
-          }
-          return callback(null, list)
+          return callback()
         })
       }),
       listAll: util.promisify((path, callback) => {
-        return storage.list(`list/${path}`, (error, list) => {
+        const params = {
+          Bucket: bucketName,
+          MaxKeys: 2147483647,
+          Prefix: `${storagePath}/list/${path}`
+        }
+        return storage.s3.listObjectsV2(params, (error, data) => {
           if (error) {
-            Log.error('error adding item', error)
+            Log.error('error listing', error)
             return callback(new Error('unknown-error'))
           }
-          if (!list || !list.length) {
-            return null
+          if (data && data.Contents && data.Contents.length) {
+            const list = data.Contents
+            for (const i in list) {
+              list[i] = list[i].split('/').pop()
+            }
+            return callback(null, list)
           }
-          for (const i in list) {
-            list[i] = list[i].split('/').pop()
-          }
-          return callback(null, list)
+          return callback()
         })
       }),
       remove: util.promisify((path, itemid, callback) => {
-        return storage.delete(`list/${path}/${itemid}`, (error) => {
+        const params = {
+          Bucket: bucketName,
+          Key: `${storagePath}/list/${path}/${itemid}`
+        }
+        return storage.s3.deleteObject(params, (error) => {
           if (error) {
-            Log.error('error adding item', error)
+            Log.error('error deleting', error)
             return callback(new Error('unknown-error'))
           }
           return callback()

@@ -34,6 +34,7 @@ module.exports = {
     const s3 = new AWS.S3(s3Options)
     return s3.createBucket({ Bucket: bucketName }, () => {
       const container = {
+        s3,
         exists: util.promisify((file, callback) => {
           if (!file) {
             return callback(new Error('invalid-file'))
@@ -43,7 +44,7 @@ module.exports = {
             Key: `${storagePath}/${file}`
           }
           return s3.headObject(params, (error, found) => {
-            if (error) {
+            if (error && error.code !== 'NotFound') {
               Log.error('error checking exists', error)
               return callback(new Error('unknown-error'))
             }
