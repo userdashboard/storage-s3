@@ -69,9 +69,9 @@ module.exports = {
               for (const item of data.Contents) {
                 files.push(item.Key.substring(storagePath.length + 1))
               }
-              return files
+              return callback(null, files)
             }
-            return null
+            return callback()
           })
         }),
         read: util.promisify((file, callback) => {
