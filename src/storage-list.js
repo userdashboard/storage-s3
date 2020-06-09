@@ -133,7 +133,7 @@ module.exports = {
               list.length = pageSize
             }
             for (const i in list) {
-              list[i] = list[i].split('/').pop()
+              list[i] = list[i].substring(`${storagePath}/list/${path}`.length)
             }
             return callback(null, list)
           }
@@ -160,7 +160,7 @@ module.exports = {
           if (listedObjects && listedObjects.Contents && listedObjects.Contents.length) {
             const list = listedObjects.Contents
             for (const i in list) {
-              list[i] = list[i].split('/').pop()
+              list[i] = list[i].substring(`${storagePath}/list/${path}`.length)
             }
             return callback(null, list)
           }
