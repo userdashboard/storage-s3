@@ -41,11 +41,10 @@ module.exports = {
       addMany: util.promisify((items, callback) => {
         const keys = Object.keys(items)
         function nextItem () {
-          if (!items.length) {
+          if (!keys.length) {
             return callback()
           }
           const path = keys.shift()
-
           const params = {
             Bucket: bucketName,
             Key: `${storagePath}/list/${path}/${items[path]}`,
@@ -56,7 +55,7 @@ module.exports = {
               Log.error('error writing', error)
               return callback(new Error('unknown-error'))
             }
-            return callback()
+            return nextItem()
           })
         }
         return nextItem()
@@ -125,6 +124,9 @@ module.exports = {
             }
           }
           if (listedObjects && listedObjects.Contents && listedObjects.Contents.length) {
+            listedObjects.Contents.sort((a, b) => {
+              return a.LastModified < b.LastModified ? 1 : -1
+            })
             const list = listedObjects.Contents
             if (offset) {
               list.splice(0, offset)
@@ -133,7 +135,7 @@ module.exports = {
               list.length = pageSize
             }
             for (const i in list) {
-              list[i] = list[i].substring(`${storagePath}/list/${path}`.length)
+              list[i] = list[i].Key.substring(`${storagePath}/list/${path}/`.length)
             }
             return callback(null, list)
           }
@@ -158,9 +160,12 @@ module.exports = {
             }
           }
           if (listedObjects && listedObjects.Contents && listedObjects.Contents.length) {
+            listedObjects.Contents.sort((a, b) => {
+              return a.LastModified < b.LastModified ? 1 : -1
+            })
             const list = listedObjects.Contents
             for (const i in list) {
-              list[i] = list[i].substring(`${storagePath}/list/${path}`.length)
+              list[i] = list[i].Key.substring(`${storagePath}/list/${path}/`.length)
             }
             return callback(null, list)
           }
