@@ -25,6 +25,8 @@ jobs:
     - uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
+    - uses: chrislennon/action-aws-cli@v1.1
+      - run: aws --endpoint-url http://localstack:4572 s3 mb s3://testing
     - name: Increase NPM version
       run: |
         git config --global user.name "${{ secrets.NAME }}"
