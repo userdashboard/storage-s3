@@ -36,15 +36,15 @@ module.exports = {
       s3.setEndpoint(s3EndPoint)
     }
     let putObject = s3.putObject
-    if (process.env.NODE_ENV === 'testing') {
-      putObject = (params, callback) => {
-        return s3.putObject(params, (error, response) => {
-          return setTimeout(() => {
-            return callback(error, response)
-          }, 1000)
-        })
-      }
-    }
+    // if (process.env.NODE_ENV === 'testing') {
+    //   putObject = (params, callback) => {
+    //     return s3.putObject(params, (error, response) => {
+    //       return setTimeout(() => {
+    //         return callback(error, response)
+    //       }, 1000)
+    //     })
+    //   }
+    // }
     Log.info('creating bucket', bucketName, moduleName)
     const container = {
       bucketName,
