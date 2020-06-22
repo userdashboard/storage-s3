@@ -201,6 +201,9 @@ module.exports = {
         container.flush = util.promisify((callback) => {
           return s3.listObjectsV2(listParams, (error, listedObjects) => {
             if (error) {
+              if (error.code === 'NoSuchBucket') {
+                return callback()
+              }
               Log.error('error deleting', error)
               return callback(new Error('unknown-error'))
             }
