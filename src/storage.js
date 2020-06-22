@@ -11,10 +11,10 @@ module.exports = {
     let Log
     const dashboardPath1 = path.join(global.applicationPath, 'node_modules/@userdashboard/dashboard/src/log.js')
     if (fs.existsSync(dashboardPath1)) {
-      Log = require(dashboardPath1)('postgresql-list')
+      Log = require(dashboardPath1)('s3')
     } else {
       const dashboardPath2 = path.join(global.applicationPath, 'src/log.js')
-      Log = require(dashboardPath2)('postgresql-list')
+      Log = require(dashboardPath2)('s3 ')
     }
     const accessKeyId = process.env[`${moduleName}_ACCESS_KEY_ID`] || process.env.ACCESS_KEY_ID
     const secretAccessKey = process.env[`${moduleName}_SECRET_ACCESS_KEY`] || process.env.SECRET_ACCESS_KEY
@@ -222,6 +222,9 @@ module.exports = {
             }
             return s3.deleteObjects(deleteParams, (error) => {
               if (error) {
+                if (error.code === 'NoSuchBucket') {
+                  return callback()
+                }
                 Log.error('error deleting', error)
                 return callback(new Error('unknown-error'))
               }
