@@ -45,6 +45,9 @@ jobs:
         cp $HERE/*.js node_modules/@userdashboard/storage-s3
         cp -R $HERE/src/ node_modules/@userdashboard/storage-s3/src/
         echo "global.applicationPath = __dirname" > main.js
+      env:
+        SECRET_ACCESS_KEY: "using-mock-aws-s3"
+        ACCESS_KEY_ID: "using-mock-aws-s3"
     - name: Test unencrypted S3-compatible storage
       run: |
         cd /tmp/project 
