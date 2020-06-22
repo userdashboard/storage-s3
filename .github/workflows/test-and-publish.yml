@@ -55,6 +55,7 @@ jobs:
         ACCESS_KEY_ID: "using-mock-aws-s3"
         GENERATE_SITEMAP_TXT: "false"
         GENERATE_API_TXT: "false"
+        LOG_LEVEL: "info,warn,error,log"
     - name: Test encrypted S3-compatible storage
       run: |
         cd /tmp/project 
@@ -74,6 +75,7 @@ jobs:
         GENERATE_API_TXT: "false"
         ENCRYPTION_SECRET: "12345678901234567890123456789012"
         ENCRYPTION_SECRET_IV: "1234123412341234"
+        LOG_LEVEL: "info,warn,error,log"
     - name: Publish to NPM
       uses: JS-DevTools/npm-publish@v1
       with:
