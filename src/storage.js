@@ -42,8 +42,13 @@ module.exports = {
         })
       }
     }
-    return s3.createBucket({ Bucket: bucketName }, () => {
+    return s3.createBucket({ Bucket: bucketName }, (error) => {
+      if (error) {
+        Log.error('error creating bucket', error)
+      }
       const container = {
+        bucketName,
+        storagePath,
         s3,
         exists: util.promisify((file, callback) => {
           if (!file) {

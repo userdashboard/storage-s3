@@ -13,8 +13,6 @@ module.exports = {
         storage = null
       }
     }
-    const bucketName = process.env[`${moduleName}_S3_BUCKET_NAME`] || process.env.S3_BUCKET_NAME
-    const storagePath = process.env[`${moduleName}_STORAGE_PATH`] || process.env.STORAGE_PATH || '/data'
     const dashboardPath1 = path.join(global.applicationPath, 'node_modules/@userdashboard/dashboard/src/log.js')
     let Log
     if (fs.existsSync(dashboardPath1)) {
@@ -36,8 +34,8 @@ module.exports = {
     const container = {
       add: util.promisify((path, itemid, callback) => {
         const params = {
-          Bucket: bucketName,
-          Key: `${storagePath}/list/${path}/${itemid}`,
+          Bucket: storage.bucketName,
+          Key: `${storage.storagePath}/list/${path}/${itemid}`,
           Body: ''
         }
         return putObject(params, (error) => {
@@ -56,8 +54,8 @@ module.exports = {
           }
           const path = keys.shift()
           const params = {
-            Bucket: bucketName,
-            Key: `${storagePath}/list/${path}/${items[path]}`,
+            Bucket: storage.bucketName,
+            Key: `${storage.storagePath}/list/${path}/${items[path]}`,
             Body: ''
           }
           return putObject(params, (error) => {
@@ -72,9 +70,9 @@ module.exports = {
       }),
       count: util.promisify((path, callback) => {
         const params = {
-          Bucket: bucketName,
+          Bucket: storage.bucketName,
           MaxKeys: 2147483647,
-          Prefix: `${storagePath}/list/${path}`
+          Prefix: `${storage.storagePath}/list/${path}`
         }
         return storage.s3.listObjectsV2(params, (error, data) => {
           if (error) {
@@ -89,8 +87,8 @@ module.exports = {
       }),
       exists: util.promisify((path, itemid, callback) => {
         const params = {
-          Bucket: bucketName,
-          Key: `${storagePath}/list/${path}/${itemid}`
+          Bucket: storage.bucketName,
+          Key: `${storage.storagePath}/list/${path}/${itemid}`
         }
         return storage.s3.headObject(params, (error, found) => {
           if (error && error.code !== 'NotFound') {
@@ -118,9 +116,9 @@ module.exports = {
           return callback(new Error('invalid-offset'))
         }
         const params = {
-          Bucket: bucketName,
+          Bucket: storage.bucketName,
           MaxKeys: 2147483647,
-          Prefix: `${storagePath}/list/${path}`
+          Prefix: `${storage.storagePath}/list/${path}`
         }
         return storage.s3.listObjectsV2(params, (error, listedObjects) => {
           if (error) {
@@ -145,7 +143,7 @@ module.exports = {
               list.length = pageSize
             }
             for (const i in list) {
-              list[i] = list[i].Key.substring(`${storagePath}/list/${path}/`.length)
+              list[i] = list[i].Key.substring(`${storage.storagePath}/list/${path}/`.length)
             }
             return callback(null, list)
           }
@@ -154,9 +152,9 @@ module.exports = {
       }),
       listAll: util.promisify((path, callback) => {
         const params = {
-          Bucket: bucketName,
+          Bucket: storage.bucketName,
           MaxKeys: 2147483647,
-          Prefix: `${storagePath}/list/${path}`
+          Prefix: `${storage.storagePath}/list/${path}`
         }
         return storage.s3.listObjectsV2(params, (error, listedObjects) => {
           if (error) {
@@ -175,7 +173,7 @@ module.exports = {
             })
             const list = listedObjects.Contents
             for (const i in list) {
-              list[i] = list[i].Key.substring(`${storagePath}/list/${path}/`.length)
+              list[i] = list[i].Key.substring(`${storage.storagePath}/list/${path}/`.length)
             }
             return callback(null, list)
           }
@@ -184,8 +182,8 @@ module.exports = {
       }),
       remove: util.promisify((path, itemid, callback) => {
         const params = {
-          Bucket: bucketName,
-          Key: `${storagePath}/list/${path}/${itemid}`
+          Bucket: storage.bucketName,
+          Key: `${storage.storagePath}/list/${path}/${itemid}`
         }
         return storage.s3.deleteObject(params, (error) => {
           if (error) {
