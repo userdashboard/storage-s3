@@ -41,11 +41,10 @@ module.exports = {
         return s3.putObject(params, (error, response) => {
           return setTimeout(() => {
             return callback(error, response)
-          }, 50)
+          }, 1)
         })
       }
     }
-    Log.info('creating bucket', bucketName, moduleName)
     const container = {
       bucketName,
       storagePath,
