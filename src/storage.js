@@ -28,6 +28,9 @@ module.exports = {
     if (process.env.NODE_ENV === 'testing') {
       s3Options.s3ForcePathStyle = true
     }
+    if (s3EndPoint) {
+      s3Options.endpoint = s3EndPoint
+    }
     const s3 = new AWS.S3(s3Options)
     if (s3EndPoint) {
       s3.setEndpoint(s3EndPoint)
