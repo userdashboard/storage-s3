@@ -19,7 +19,8 @@ jobs:
           USE_SSL: false
           DEBUG: 1
         ports:
-          - 4566:4566
+          - "4566:4566"
+          - "4572:4572"
     steps:
     - uses: actions/checkout@v1
     - uses: actions/setup-node@v1
@@ -33,7 +34,7 @@ jobs:
         npm version patch
     - name: Set up as module
       run: |
-        aws --endpoint-url http://localstack:4566 s3 mb s3://testing
+        aws --endpoint-url http://localstack:4572 s3 mb s3://testing
         HERE=`pwd`
         mkdir /tmp/project
         cd /tmp/project
