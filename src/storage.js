@@ -32,6 +32,16 @@ module.exports = {
       s3Options.s3ForcePathStyle = true
     }
     const s3 = new AWS.S3(s3Options)
+    let putObject = s3.putObject
+    if (process.env.NODE_ENV === 'testing') {
+      putObject = (params, callback) => {
+        return s3.putObject(params, (error, response) => {
+          return setTimeout(() => {
+            return callback(error, response)
+          }, 1000)
+        })
+      }
+    }
     return s3.createBucket({ Bucket: bucketName }, () => {
       const container = {
         s3,
@@ -147,7 +157,7 @@ module.exports = {
             Key: `${storagePath}/${file}`,
             Body: contents.toString()
           }
-          return s3.putObject(params, (error) => {
+          return putObject(params, (error) => {
             if (error) {
               Log.error('error writing', error)
               return callback(new Error('unknown-error'))
@@ -167,7 +177,7 @@ module.exports = {
             Key: `${storagePath}/${file}`,
             Body: buffer
           }
-          return s3.putObject(params, (error) => {
+          return putObject(params, (error) => {
             if (error) {
               Log.error('error writing binary', error)
               return callback(new Error('unknown-error'))

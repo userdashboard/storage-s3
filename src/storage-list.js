@@ -23,6 +23,16 @@ module.exports = {
       const dashboardPath2 = path.join(global.applicationPath, 'src/log.js')
       Log = require(dashboardPath2)('s3-list')
     }
+    let putObject = storage.s3.putObject
+    if (process.env.NODE_ENV === 'testing') {
+      putObject = (params, callback) => {
+        return storage.s3.putObject(params, (error, response) => {
+          return setTimeout(() => {
+            return callback(error, response)
+          }, 1000)
+        })
+      }
+    }
     const container = {
       add: util.promisify((path, itemid, callback) => {
         const params = {
@@ -30,7 +40,7 @@ module.exports = {
           Key: `${storagePath}/list/${path}/${itemid}`,
           Body: ''
         }
-        return storage.s3.putObject(params, (error) => {
+        return putObject(params, (error) => {
           if (error) {
             Log.error('error writing', error)
             return callback(new Error('unknown-error'))
@@ -50,7 +60,7 @@ module.exports = {
             Key: `${storagePath}/list/${path}/${items[path]}`,
             Body: ''
           }
-          return storage.s3.putObject(params, (error) => {
+          return putObject(params, (error) => {
             if (error) {
               Log.error('error writing', error)
               return callback(new Error('unknown-error'))
