@@ -34,9 +34,9 @@ jobs:
     - name: Set up as module
       run: |
         aws --endpoint-url=http://localhost:4572 s3 mb s3://testing
-        npm install faker puppeteer@2.1.1 @userdashboard/dashboard @userdashboard/storage-s3 --no-save
+        npm install faker puppeteer@2.1.1 @userdashboard/dashboard --no-save
         npm install -g mocha
-        rm node_modules/@userdashboard/storage-s3/*.js
+        mkdir -p node_modules/@userdashboard/storage-s3
         rm -rf node_modules/@userdashboard/storage-s3/src
         cp *.js node_modules/@userdashboard/storage-s3
         cp -R src/ node_modules/@userdashboard/storage-s3/src/
