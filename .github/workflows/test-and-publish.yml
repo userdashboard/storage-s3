@@ -34,25 +34,17 @@ jobs:
     - name: Set up as module
       run: |
         aws --endpoint-url=http://localhost:4572 s3 mb s3://testing
-        HERE=`pwd`
-        mkdir /tmp/project
-        cd /tmp/project
-        npm init -y
-        npm install faker puppeteer@2.1.1 @userdashboard/dashboard @userdashboard/storage-s3
+        npm install faker puppeteer@2.1.1 @userdashboard/dashboard @userdashboard/storage-s3 --no-save
         npm install -g mocha
         rm node_modules/@userdashboard/storage-s3/*.js
         rm -rf node_modules/@userdashboard/storage-s3/src
-        cp $HERE/*.js node_modules/@userdashboard/storage-s3
-        cp -R $HERE/src/ node_modules/@userdashboard/storage-s3/src/
-        echo "global.applicationPath = __dirname" > main.js
+        cp *.js node_modules/@userdashboard/storage-s3
+        cp -R src/ node_modules/@userdashboard/storage-s3/src/
       env:
         AWS_SECRET_ACCESS_KEY: "using-mock-aws-s3"
         AWS_ACCESS_KEY_ID: "using-mock-aws-s3"
     - name: Test unencrypted S3-compatible storage
-      run: |
-        cd /tmp/project 
-        mocha --file main.js --bail --exit --full-trace --recursive --timeout 90000000 "./node_modules/@userdashboard/**/{,!(public)}/*.test.js"
-        cd $HERE
+      run: mocha --file test-helper.js --bail --exit --full-trace --recursive --timeout 90000000 "./node_modules/@userdashboard/**/{,!(public)}/*.test.js"
       env:
         NODE_ENV: "testing"
         FAST_START: "true"
@@ -67,10 +59,7 @@ jobs:
         GENERATE_API_TXT: "false"
         LOG_LEVEL: "info,warn,error,log"
     - name: Test encrypted S3-compatible storage
-      run: |
-        cd /tmp/project 
-        mocha --file main.js --bail --exit --full-trace --recursive --timeout 90000000 "./node_modules/@userdashboard/**/{,!(public)}/*.test.js"
-        cd $HERE
+      run: mocha --file test-helper.js --bail --exit --full-trace --recursive --timeout 90000000 "./node_modules/@userdashboard/**/{,!(public)}/*.test.js"
       env:
         NODE_ENV: testing
         FAST_START: "true"
