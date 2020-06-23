@@ -21,48 +21,29 @@ jobs:
         ports:
           - "4566-4599:4566-4599"
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
     - uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - uses: chrislennon/action-aws-cli@v1.1
-    - name: Increase NPM version
+    - name: Install dependencies
       run: |
+        npm install mocha faker puppeteer@2.1.1 @userdashboard/dashboard --no-save
         git config --global user.name "${{ secrets.NAME }}"
         git config --global user.email "${{ secrets.EMAIL }}"
-        npm version patch
-    - name: Set up as module
-      run: |
-        aws --endpoint-url=http://localhost:4572 s3 mb s3://testing
-        npm install faker puppeteer@2.1.1 @userdashboard/dashboard --no-save
-        npm install -g mocha
+        npm install -g mocha standard
         mkdir -p node_modules/@userdashboard/storage-s3
         rm -rf node_modules/@userdashboard/storage-s3/src
         cp *.js node_modules/@userdashboard/storage-s3
         cp -R src/ node_modules/@userdashboard/storage-s3/src/
-      env:
-        AWS_SECRET_ACCESS_KEY: "using-mock-aws-s3"
-        AWS_ACCESS_KEY_ID: "using-mock-aws-s3"
-    - name: Test unencrypted S3-compatible storage
-      run: mocha --file test-helper.js --bail --exit --full-trace --recursive --timeout 90000000 "./node_modules/@userdashboard/**/{,!(public)}/*.test.js"
-      env:
-        NODE_ENV: "testing"
-        FAST_START: "true"
-        DASHBOARD_SERVER: "http://localhost:9000"
-        DOMAIN: "localhost"
-        STORAGE: "@userdashboard/storage-s3"
-        S3_ENDPOINT: "http://localhost:4566"
-        S3_BUCKET_NAME: "testing"
-        SECRET_ACCESS_KEY: "using-mock-aws-s3"
-        ACCESS_KEY_ID: "using-mock-aws-s3"
-        GENERATE_SITEMAP_TXT: "false"
-        GENERATE_API_TXT: "false"
-        LOG_LEVEL: "info,warn,error,log"
-    - name: Test encrypted S3-compatible storage
-      run: mocha --file test-helper.js --bail --exit --full-trace --recursive --timeout 90000000 "./node_modules/@userdashboard/**/{,!(public)}/*.test.js"
+    - name: Lint (standard.js)
+      run: standard src
+    - name: Increase NPM version
+      run: npm version patch
+    - name: Test
+      run: mocha --file test-helper.js --bail --exit --full-trace --recursive --timeout 90000000 "./node_modules/@userdashboard/**/{,!(public)}/*.test.js" > tests.txt
       env:
         NODE_ENV: testing
-        FAST_START: "true"
+        FAST_START: true
         DASHBOARD_SERVER: "http://localhost:9000"
         DOMAIN: "localhost"
         STORAGE: "@userdashboard/storage-s3"
@@ -70,19 +51,16 @@ jobs:
         S3_BUCKET_NAME: "testing"
         SECRET_ACCESS_KEY: "using-mock-aws-s3"
         ACCESS_KEY_ID: "using-mock-aws-s3"
-        GENERATE_SITEMAP_TXT: "false"
-        GENERATE_API_TXT: "false"
-        ENCRYPTION_SECRET: "12345678901234567890123456789012"
-        ENCRYPTION_SECRET_IV: "1234123412341234"
-        LOG_LEVEL: "info,warn,error,log"
+        GENERATE_SITEMAP_TXT: false
+        GENERATE_API_TXT: false
     - name: Publish to Github
       uses: stefanzweifel/git-auto-commit-action@v4.1.6
       with:
         commit_message: Automatically regenerated against current version
         branch: ${{ github.head_ref }}
         commit_options: '--no-verify --signoff'
-        repository: . 
+        repository: .
     - name: Publish to NPM
       uses: JS-DevTools/npm-publish@v1
       with:
-        token: ${{ secrets.NPM_TOKEN }}
+        token: ${{ secrets.NPM_TOKEN }} name: test-and-publish
