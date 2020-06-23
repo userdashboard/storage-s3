@@ -37,6 +37,9 @@ jobs:
         rm -rf node_modules/@userdashboard/storage-s3/src
         cp *.js node_modules/@userdashboard/storage-s3
         cp -R src/ node_modules/@userdashboard/storage-s3/src/
+      env:
+        AWS_SECRET_ACCESS_KEY: "using-mock-aws-s3"
+        AWS_ACCESS_KEY_ID: "using-mock-aws-s3"
     - name: Lint (standard.js)
       run: standard src
     - name: Increase NPM version
