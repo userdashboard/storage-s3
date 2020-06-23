@@ -21,12 +21,14 @@ jobs:
         ports:
           - "4566-4599:4566-4599"
     steps:
+    - uses: chrislennon/action-aws-cli@v1.1
     - uses: actions/checkout@v2
     - uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
     - name: Install dependencies
       run: |
+        aws s3 mb s3://testing
         npm install faker puppeteer@2.1.1 @userdashboard/dashboard --no-save
         git config --global user.name "${{ secrets.NAME }}"
         git config --global user.email "${{ secrets.EMAIL }}"
