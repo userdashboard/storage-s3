@@ -29,11 +29,11 @@ jobs:
     - name: Install dependencies
       run: |
         aws --endpoint-url=http://localhost:4566 s3 mb s3://testing
+        git config --global user.name "${{ secrets.NAME }}"
+        git config --global user.email "${{ secrets.EMAIL }}"
         npm version patch
         npm install
         npm install faker puppeteer@2.1.1 @userdashboard/dashboard --no-save
-        git config --global user.name "${{ secrets.NAME }}"
-        git config --global user.email "${{ secrets.EMAIL }}"
         npm install -g mocha standard
         mkdir -p node_modules/@userdashboard/storage-s3
         rm -rf node_modules/@userdashboard/storage-s3/src
