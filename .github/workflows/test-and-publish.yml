@@ -42,7 +42,7 @@ jobs:
         cp -R src/ node_modules/@userdashboard/storage-s3/src/
         cp package.json package.json.old
         PACKAGE=`cat package.json`
-        PACKAGE=${PACKAGE/\"description\"\: \"\"/\"dashboard\": \{ \"modules\"\: \[\"@userdashboard/organizations\"\] \}}
+        PACKAGE=${PACKAGE/\"deprecated\"\: false,/\"dashboard\": \{ \"modules\"\: \[\"@userdashboard/organizations\"\] \}}
         echo $PACKAGE > package.json
       env:
         AWS_SECRET_ACCESS_KEY: "using-mock-aws-s3"
