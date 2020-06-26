@@ -35,7 +35,7 @@ jobs:
         git config --global user.email "${{ secrets.EMAIL }}"
         npm version patch
         npm install
-        npm install faker puppeteer@2.1.1 @userdashboard/dashboard @userdashboard/organizations  @userdashboard/storage-redis --no-save
+        npm install faker puppeteer@2.1.1 @userdashboard/dashboard @userdashboard/organizations @userdashboard/storage-redis --no-save
         npm install -g mocha standard
         mkdir -p node_modules/@userdashboard/storage-s3
         cp *.js node_modules/@userdashboard/storage-s3
@@ -80,7 +80,6 @@ jobs:
         ORGANIZATIONS_REDIS_URL: "redis://localhost:6379"
         GENERATE_SITEMAP_TXT: false
         GENERATE_API_TXT: false
-        LOG_LEVEL: "info,warn,debug,log"
     - name: Test as module storage
       run: mocha --file test-helper.js --bail --exit --full-trace --recursive --timeout 90000000 "./node_modules/@userdashboard/**/{,!(public)}/*.test.js"
       env:
@@ -97,7 +96,6 @@ jobs:
         ORGANIZATIONS_ACCESS_KEY_ID: "using-mock-aws-s3"
         GENERATE_SITEMAP_TXT: false
         GENERATE_API_TXT: false
-        LOG_LEVEL: "info,warn,debug,log"
     - name: Test as primary and separately as module storage
       run: mocha --file test-helper.js --bail --exit --full-trace --recursive --timeout 90000000 "./node_modules/@userdashboard/**/{,!(public)}/*.test.js"
       env:
@@ -117,7 +115,6 @@ jobs:
         ORGANIZATIONS_ACCESS_KEY_ID: "using-mock-aws-s3"
         GENERATE_SITEMAP_TXT: false
         GENERATE_API_TXT: false
-        LOG_LEVEL: "info,warn,debug,log"
     - name: Clean up
       run: |
         rm package.json
