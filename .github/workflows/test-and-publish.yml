@@ -52,7 +52,7 @@ jobs:
     - name: Test as only storage
       run: |
         mocha --file test-helper.js --bail --exit --full-trace --recursive --timeout 90000000 "./node_modules/@userdashboard/**/{,!(public)}/*.test.js" | tee tests.txt
-        TESTS=`cat /home/runner/work/stripe-connect/stripe-connect/tests.txt`
+        TESTS=`cat tests.txt`
         if [[ "$TESTS" == *" 1)"* ]]; then
           exit 1
         fi
@@ -71,7 +71,7 @@ jobs:
     - name: Test as primary storage
       run: |
         mocha --file test-helper.js --bail --exit --full-trace --recursive --timeout 90000000 "./node_modules/@userdashboard/**/{,!(public)}/*.test.js" | tee tests.txt
-        TESTS=`cat /home/runner/work/stripe-connect/stripe-connect/tests.txt`
+        TESTS=`cat tests.txt`
         if [[ "$TESTS" == *" 1)"* ]]; then
           exit 1
         fi
@@ -92,7 +92,7 @@ jobs:
     - name: Test as module storage
       run: |
         mocha --file test-helper.js --bail --exit --full-trace --recursive --timeout 90000000 "./node_modules/@userdashboard/**/{,!(public)}/*.test.js" | tee tests.txt
-        TESTS=`cat /home/runner/work/stripe-connect/stripe-connect/tests.txt`
+        TESTS=`cat tests.txt`
         if [[ "$TESTS" == *" 1)"* ]]; then
           exit 1
         fi
@@ -113,7 +113,7 @@ jobs:
     - name: Test as primary and separately as module storage
       run: |
         mocha --file test-helper.js --bail --exit --full-trace --recursive --timeout 90000000 "./node_modules/@userdashboard/**/{,!(public)}/*.test.js" | tee tests.txt
-        TESTS=`cat /home/runner/work/stripe-connect/stripe-connect/tests.txt`
+        TESTS=`cat tests.txt`
         if [[ "$TESTS" == *" 1)"* ]]; then
           exit 1
         fi
