@@ -1,6 +1,6 @@
 {
   "name": "@userdashboard/storage-s3",
-  "version": "1.0.36",
+  "version": "1.0.37",
   "main": "index.js",
   "description": "Use Amazon S3 as storage for Dashboard",
   "deprecated": false,
