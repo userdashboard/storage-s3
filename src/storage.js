@@ -41,7 +41,7 @@ module.exports = {
         return s3.putObject(params, (error, response) => {
           return setTimeout(() => {
             return callback(error, response)
-          }, 100)
+          }, 150)
         })
       }
     }
