@@ -27,7 +27,7 @@ module.exports = {
         return storage.s3.putObject(params, (error, response) => {
           return setTimeout(() => {
             return callback(error, response)
-          }, 600)
+          }, 500)
         })
       }
     }
