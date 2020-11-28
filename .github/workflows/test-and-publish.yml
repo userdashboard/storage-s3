@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [12.x]
+        node-version: [14.15.1]
     services:
       localstack:
         image: localstack/localstack:latest
@@ -30,59 +30,79 @@ jobs:
       with:
         redis version: '5'
         number of databases: 1
-    - name: Install dependencies
+    - name: Optionally install Chromium via APT instead of puppeteer
+      run: |
+        if [ ! -z "$PUPPETEER_SKIP_CHROMIUM_DOWNLOAD" ]; then
+          APT_INSTALL="chromium gconf-service libasound2 libatk1.0-0 libc6 libcairo2 libcups2 libdbus-1-3 libexpat1 libfontconfig1 libgcc1 libgconf-2-4 libgdk-pixbuf2.0-0 libglib2.0-0 libgtk-3-0 libnspr4 libpango-1.0-0 libpangocairo-1.0-0 libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxdamage1 libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 libxtst6 ca-certificates fonts-liberation libappindicator1 libnss3 lsb-release xdg-utils wget"
+          if [ ! -z "$APT_PROXY" ]; then
+            echo "deb $APT_PROXY buster main" > /etc/apt/sources.list
+          fi
+          apt-get update
+          apt-get install -y $APT_INSTALL
+        fi
+    - name: Configure git and increase version
+      run: |
+        if [ ! -z "$INSTALL_GIT" ]; then
+          if [ ! -z "$APT_PROXY" ]; then
+            echo "deb $APT_PROXY buster main" > /etc/apt/sources.list
+          fi
+          if [ -z "$PUPPETEER_SKIP_CHROMIUM_DOWNLOAD" ]; then
+            apt-get update
+          fi
+          apt-get install -y git
+        fi
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        npm version patch
+    - name: Set up project
       run: |
         aws --endpoint-url=http://localhost:4566 s3 mb s3://testing
         aws --endpoint-url=http://localhost:4566 s3 mb s3://testing2
-        git config --global user.name "${{ secrets.NAME }}"
-        git config --global user.email "${{ secrets.EMAIL }}"
-        npm version patch
-        npm install
-        npm install faker puppeteer@2.1.1 @userdashboard/dashboard @userdashboard/organizations @userdashboard/storage-redis --no-save
-        npm install -g mocha standard
-        mkdir -p node_modules/@userdashboard/storage-s3
-        cp *.js node_modules/@userdashboard/storage-s3
-        cp -R src/ node_modules/@userdashboard/storage-s3/src/
-        cp package.json package.json.old
+        HERE=`pwd`
+        mkdir /tmp/project
+        cd /tmp/project
+        npm init -y
+        npm install "$HERE" @userdashboard/dashboard @userdashboard/organizations @userdashboard/storage-redis mocha faker puppeteer
         PACKAGE=`cat package.json`
         PACKAGE=${PACKAGE/\"deprecated\"\: false/\"dashboard\": \{ \"modules\"\: \[\"@userdashboard/organizations\"\] \}}
         echo $PACKAGE > package.json
+        echo "global.applicationPath = __dirname" > main.js
       env:
         AWS_SECRET_ACCESS_KEY: "using-mock-aws-s3"
         AWS_ACCESS_KEY_ID: "using-mock-aws-s3"
-    - name: Lint (standard.js)
-      run: standard src
+    - name: Lint with standard.js
+      run: |
+        if [ ! -z "$NPM_PROXY" ]; then
+          npm --registry=$NPM_PROXY install standard -g
+        else
+          npm install standard -g
+        fi        
+        standard
     - name: Test as only storage
       run: |
-        mocha --file test-helper.js --bail --exit --full-trace --recursive --timeout 90000000 "./node_modules/@userdashboard/**/{,!(public)}/*.test.js" | tee tests.txt
+        ./node_modules/.bin/mocha --file main.js --bail --exit --full-trace --recursive --timeout 90000000 "./node_modules/@userdashboard/**/{,!(public)}/*.test.js" | tee tests.txt
         TESTS=`cat tests.txt`
         if [[ "$TESTS" == *" 1)"* ]]; then
           exit 1
         fi
+      working-directory: /tmp/project
       env:
         NODE_ENV: testing
-        FAST_START: true
-        DASHBOARD_SERVER: "http://localhost:9000"
-        DOMAIN: "localhost"
         STORAGE: "@userdashboard/storage-s3"
         S3_ENDPOINT: "http://localhost:4566"
         S3_BUCKET_NAME: "testing"
         SECRET_ACCESS_KEY: "using-mock-aws-s3"
         ACCESS_KEY_ID: "using-mock-aws-s3"
-        GENERATE_SITEMAP_TXT: false
-        GENERATE_API_TXT: false
     - name: Test as primary storage
       run: |
-        mocha --file test-helper.js --bail --exit --full-trace --recursive --timeout 90000000 "./node_modules/@userdashboard/**/{,!(public)}/*.test.js" | tee tests.txt
+        ./node_modules/.bin/mocha --file main.js --bail --exit --full-trace --recursive --timeout 90000000 "./node_modules/@userdashboard/**/{,!(public)}/*.test.js" | tee tests.txt
         TESTS=`cat tests.txt`
         if [[ "$TESTS" == *" 1)"* ]]; then
           exit 1
         fi
+      working-directory: /tmp/project
       env:
         NODE_ENV: testing
-        FAST_START: true
-        DASHBOARD_SERVER: "http://localhost:9000"
-        DOMAIN: "localhost"
         STORAGE: "@userdashboard/storage-s3"
         S3_ENDPOINT: "http://localhost:4566"
         S3_BUCKET_NAME: "testing"
@@ -90,20 +110,16 @@ jobs:
         ACCESS_KEY_ID: "using-mock-aws-s3"
         ORGANIZATIONS_STORAGE: "@userdashboard/storage-redis"
         ORGANIZATIONS_REDIS_URL: "redis://localhost:6379"
-        GENERATE_SITEMAP_TXT: false
-        GENERATE_API_TXT: false
     - name: Test as module storage
       run: |
-        mocha --file test-helper.js --bail --exit --full-trace --recursive --timeout 90000000 "./node_modules/@userdashboard/**/{,!(public)}/*.test.js" | tee tests.txt
+        ./node_modules/.bin/mocha --file main.js --bail --exit --full-trace --recursive --timeout 90000000 "./node_modules/@userdashboard/**/{,!(public)}/*.test.js" | tee tests.txt
         TESTS=`cat tests.txt`
         if [[ "$TESTS" == *" 1)"* ]]; then
           exit 1
         fi
+      working-directory: /tmp/project
       env:
         NODE_ENV: testing
-        FAST_START: true
-        DASHBOARD_SERVER: "http://localhost:9000"
-        DOMAIN: "localhost"
         STORAGE: "@userdashboard/storage-redis"
         REDIS_URL: "redis://localhost:6379"
         ORGANIZATIONS_STORAGE: "@userdashboard/storage-s3"
@@ -111,20 +127,16 @@ jobs:
         ORGANIZATIONS_S3_BUCKET_NAME: "testing"
         ORGANIZATIONS_SECRET_ACCESS_KEY: "using-mock-aws-s3"
         ORGANIZATIONS_ACCESS_KEY_ID: "using-mock-aws-s3"
-        GENERATE_SITEMAP_TXT: false
-        GENERATE_API_TXT: false
     - name: Test as primary and separately as module storage
       run: |
-        mocha --file test-helper.js --bail --exit --full-trace --recursive --timeout 90000000 "./node_modules/@userdashboard/**/{,!(public)}/*.test.js" | tee tests.txt
+        ./node_modules/.bin/mocha --file main.js --bail --exit --full-trace --recursive --timeout 90000000 "./node_modules/@userdashboard/**/{,!(public)}/*.test.js" | tee tests.txt
         TESTS=`cat tests.txt`
         if [[ "$TESTS" == *" 1)"* ]]; then
           exit 1
         fi
+      working-directory: /tmp/project
       env:
         NODE_ENV: testing
-        FAST_START: true
-        DASHBOARD_SERVER: "http://localhost:9000"
-        DOMAIN: "localhost"
         STORAGE: "@userdashboard/storage-s3"
         S3_ENDPOINT: "http://localhost:4566"
         S3_BUCKET_NAME: "testing"
@@ -135,12 +147,6 @@ jobs:
         ORGANIZATIONS_S3_BUCKET_NAME: "testing2"
         ORGANIZATIONS_SECRET_ACCESS_KEY: "using-mock-aws-s3"
         ORGANIZATIONS_ACCESS_KEY_ID: "using-mock-aws-s3"
-        GENERATE_SITEMAP_TXT: false
-        GENERATE_API_TXT: false
-    - name: Clean up
-      run: |
-        rm package.json
-        mv package.json.old package.json
     - name: Publish to Github
       uses: stefanzweifel/git-auto-commit-action@v4.1.6
       with:
