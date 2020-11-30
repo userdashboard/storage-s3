@@ -19,7 +19,6 @@ jobs:
         ports:
           - "4566-4599:4566-4599"
     steps:
-    - uses: chrislennon/action-aws-cli@v1.1
     - uses: actions/checkout@v2
     - uses: actions/setup-node@v1
       with:
