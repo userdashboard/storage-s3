@@ -4,9 +4,9 @@
   "main": "index.js",
   "description": "Use Amazon S3 as storage for Dashboard",
   "deprecated": false,
-  "engine": {
-    "node": "14.15.1",
-    "npm": "6.14.8"
+  "engines": {
+    "node" : ">=12.0",
+    "npm" : ">=6.0"
   },
   "repository": {
     "type": "git",
@@ -14,10 +14,18 @@
   },
   "license": "MIT",
   "scripts": {
-    "start": "node main.js",
-    "test": "NODE_ENV=testing mocha node_modules/@userdashboard/dashboard/src --recursive --timeout 480000 --slow 480000"
+    "test": "act -j test"
   },
   "dependencies": {
     "aws-sdk": "^2.382.0"
+  },
+  "peerDependencies": {
+    "@userdashboard/dashboard": "1.x"
+  },
+  "optionalDependencies": {
+    "@userdashboard/dashboard": "1.x"
+  },
+  "devDependencies": {
+    "@userdashboard/dashboard": "1.x"
   }
 }
