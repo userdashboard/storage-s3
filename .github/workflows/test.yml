@@ -25,7 +25,7 @@ jobs:
         node-version: 14
     - uses: zhulik/redis-action@1.1.0
       with:
-        redis version: '5'
+        redis version: 5
         number of databases: 1
     - name: Optionally install Chromium via APT instead of puppeteer
       run: |
@@ -51,12 +51,12 @@ jobs:
         npm init -y
         npm install "$HERE" @userdashboard/dashboard @userdashboard/organizations @userdashboard/storage-redis mocha faker puppeteer
         PACKAGE=`cat package.json`
-        PACKAGE=${PACKAGE/\"deprecated\"\: false/\"dashboard\": \{ \"modules\"\: \[\"@userdashboard/organizations\"\] \}}
+        PACKAGE=${PACKAGE/\"author\"\: \"\"/\"dashboard\": \{ \"modules\"\: \[\"@userdashboard/organizations\"\] \}}
         echo $PACKAGE > package.json
         echo "global.applicationPath = __dirname" > main.js
       env:
-        AWS_SECRET_ACCESS_KEY: "using-mock-aws-s3"
-        AWS_ACCESS_KEY_ID: "using-mock-aws-s3"
+        AWS_SECRET_ACCESS_KEY: using-mock-aws-s3
+        AWS_ACCESS_KEY_ID: using-mock-aws-s3
     - name: Test as only storage for Dashboard and modules
       run: |
         ./node_modules/.bin/mocha --file main.js --bail --exit --recursive --timeout 90000000 $(find ./node_modules/@userdashboard/*/ -name "*.test.js" | grep -i -v [a-z]/node_modules | sort -k5.1,8.1 -t /) | tee tests.txt
@@ -67,12 +67,12 @@ jobs:
       working-directory: /tmp/project
       env:
         NODE_ENV: testing
-        STORAGE: "@userdashboard/storage-s3"
-        S3_ENDPOINT: "http://localhost:4566"
-        S3_BUCKET_NAME: "testing"
-        SECRET_ACCESS_KEY: "using-mock-aws-s3"
-        ACCESS_KEY_ID: "using-mock-aws-s3"
-        NODE_OPTIONS: "--preserve-symlinks"
+        STORAGE: @userdashboard/storage-s3
+        S3_ENDPOINT: http://localhost:4566
+        S3_BUCKET_NAME: testing
+        SECRET_ACCESS_KEY: using-mock-aws-s3
+        ACCESS_KEY_ID: using-mock-aws-s3
+        NODE_OPTIONS: --preserve-symlinks
     - name: Test as Dashboard storage with module on other type
       run: |
         ./node_modules/.bin/mocha --file main.js --bail --exit --recursive --timeout 90000000 $(find ./node_modules/@userdashboard/*/ -name "*.test.js" | grep -i -v [a-z]/node_modules | sort -k5.1,8.1 -t /) | tee tests.txt
@@ -83,14 +83,14 @@ jobs:
       working-directory: /tmp/project
       env:
         NODE_ENV: testing
-        STORAGE: "@userdashboard/storage-s3"
-        S3_ENDPOINT: "http://localhost:4566"
-        S3_BUCKET_NAME: "testing"
-        SECRET_ACCESS_KEY: "using-mock-aws-s3"
-        ACCESS_KEY_ID: "using-mock-aws-s3"
-        ORGANIZATIONS_STORAGE: "@userdashboard/storage-redis"
-        ORGANIZATIONS_REDIS_URL: "redis://localhost:6379"
-        NODE_OPTIONS: "--preserve-symlinks"
+        STORAGE: @userdashboard/storage-s3
+        S3_ENDPOINT: http://localhost:4566
+        S3_BUCKET_NAME: testing
+        SECRET_ACCESS_KEY: using-mock-aws-s3
+        ACCESS_KEY_ID: using-mock-aws-s3
+        ORGANIZATIONS_STORAGE: @userdashboard/storage-redis
+        ORGANIZATIONS_REDIS_URL: redis://localhost:6379
+        NODE_OPTIONS: --preserve-symlinks
     - name: Test as module storage with Dashboard on other type
       run: |
         ./node_modules/.bin/mocha --file main.js --bail --exit --recursive --timeout 90000000 $(find ./node_modules/@userdashboard/*/ -name "*.test.js" | grep -i -v [a-z]/node_modules | sort -k5.1,8.1 -t /) | tee tests.txt
@@ -101,14 +101,14 @@ jobs:
       working-directory: /tmp/project
       env:
         NODE_ENV: testing
-        STORAGE: "@userdashboard/storage-redis"
-        REDIS_URL: "redis://localhost:6379"
-        ORGANIZATIONS_STORAGE: "@userdashboard/storage-s3"
-        ORGANIZATIONS_S3_ENDPOINT: "http://localhost:4566"
-        ORGANIZATIONS_S3_BUCKET_NAME: "testing"
-        ORGANIZATIONS_SECRET_ACCESS_KEY: "using-mock-aws-s3"
-        ORGANIZATIONS_ACCESS_KEY_ID: "using-mock-aws-s3"
-        NODE_OPTIONS: "--preserve-symlinks"
+        STORAGE: @userdashboard/storage-redis
+        REDIS_URL: redis://localhost:6379
+        ORGANIZATIONS_STORAGE: @userdashboard/storage-s3
+        ORGANIZATIONS_S3_ENDPOINT: http://localhost:4566
+        ORGANIZATIONS_S3_BUCKET_NAME: testing
+        ORGANIZATIONS_SECRET_ACCESS_KEY: using-mock-aws-s3
+        ORGANIZATIONS_ACCESS_KEY_ID: using-mock-aws-s3
+        NODE_OPTIONS: --preserve-symlinks
     - name: Test as Dashboard and module storage using separate servers
       run: |
         ./node_modules/.bin/mocha --file main.js --bail --exit --recursive --timeout 90000000 $(find ./node_modules/@userdashboard/*/ -name "*.test.js" | grep -i -v [a-z]/node_modules | sort -k5.1,8.1 -t /) | tee tests.txt
@@ -119,17 +119,17 @@ jobs:
       working-directory: /tmp/project
       env:
         NODE_ENV: testing
-        STORAGE: "@userdashboard/storage-s3"
-        S3_ENDPOINT: "http://localhost:4566"
-        S3_BUCKET_NAME: "testing"
-        SECRET_ACCESS_KEY: "using-mock-aws-s3"
-        ACCESS_KEY_ID: "using-mock-aws-s3"
-        ORGANIZATIONS_STORAGE: "@userdashboard/storage-s3"
-        ORGANIZATIONS_S3_ENDPOINT: "http://localhost:4566"
+        STORAGE: @userdashboard/storage-s3
+        S3_ENDPOINT: http://localhost:4566
+        S3_BUCKET_NAME: testing
+        SECRET_ACCESS_KEY: using-mock-aws-s3
+        ACCESS_KEY_ID: using-mock-aws-s3
+        ORGANIZATIONS_STORAGE: @userdashboard/storage-s3
+        ORGANIZATIONS_S3_ENDPOINT: http://localhost:4566
         ORGANIZATIONS_S3_BUCKET_NAME: "testing2"
-        ORGANIZATIONS_SECRET_ACCESS_KEY: "using-mock-aws-s3"
-        ORGANIZATIONS_ACCESS_KEY_ID: "using-mock-aws-s3"
-        NODE_OPTIONS: "--preserve-symlinks"
+        ORGANIZATIONS_SECRET_ACCESS_KEY: using-mock-aws-s3
+        ORGANIZATIONS_ACCESS_KEY_ID: using-mock-aws-s3
+        NODE_OPTIONS: --preserve-symlinks
     - name: Publish to Github
       uses: stefanzweifel/git-auto-commit-action@v4.1.6
       with:
