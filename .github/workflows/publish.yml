@@ -5,14 +5,13 @@ on: [push]
 jobs:
   publish:
     runs-on: ubuntu-latest
-
     services:
       localstack:
         image: localstack/localstack:latest
         env:
           SERVICES: s3
           DEFAULT_REGION: us-east-1
-          FORCE_NONINTERACTIVE: 'true'
+          FORCE_NONINTERACTIVE: true
           HOSTNAME: localhost
           USE_SSL: false
           DEBUG: 1
@@ -35,6 +34,13 @@ jobs:
       with:
         redis version: 5
         number of databases: 1
+    - name: Optionally install AWS-CLI via PIP for using own localstack with 'act'
+      run: |
+        if [ ! -z "$INSTALL_AWSCLI" ]; then
+          mkdir -p /usr/share/man/man1
+          apt install -y python3 python3-pip
+          python3 -m pip install awscli
+        fi
     - name: Optionally install Chromium via APT instead of puppeteer
       run: |
         if [ ! -z "$PUPPETEER_SKIP_CHROMIUM_DOWNLOAD" ]; then
@@ -61,8 +67,14 @@ jobs:
         npm version patch
     - name: Set up project
       run: |
-        aws --endpoint-url=http://localhost:4566 s3 mb s3://testing
-        aws --endpoint-url=http://localhost:4566 s3 mb s3://testing2
+        if [ ! -z "$S3_ENDPOINT" ]; then
+          export S3_ENDPOINT=http://0.0.0.0:4566
+        fi
+        if [ ! -z "$ORGANIZATIONS_S3_ENDPOINT" ]; then
+          export ORGANIZATIONS_S3_ENDPOINT=http://0.0.0.0:4566
+        fi
+        aws s3 mb s3://testing
+        aws s3 mb s3://testing2
         HERE=`pwd`
         mkdir /tmp/project
         cd /tmp/project
@@ -91,7 +103,6 @@ jobs:
       env:
         NODE_ENV: testing
         STORAGE: "@userdashboard/storage-s3"
-        S3_ENDPOINT: http://localhost:4566
         S3_BUCKET_NAME: testing
         SECRET_ACCESS_KEY: using-mock-aws-s3
         ACCESS_KEY_ID: using-mock-aws-s3
@@ -107,7 +118,6 @@ jobs:
       env:
         NODE_ENV: testing
         STORAGE: "@userdashboard/storage-s3"
-        S3_ENDPOINT: http://localhost:4566
         S3_BUCKET_NAME: testing
         SECRET_ACCESS_KEY: using-mock-aws-s3
         ACCESS_KEY_ID: using-mock-aws-s3
@@ -127,7 +137,6 @@ jobs:
         STORAGE: "@userdashboard/storage-redis"
         REDIS_URL: redis://localhost:6379
         ORGANIZATIONS_STORAGE: "@userdashboard/storage-s3"
-        ORGANIZATIONS_S3_ENDPOINT: http://localhost:4566
         ORGANIZATIONS_S3_BUCKET_NAME: testing
         ORGANIZATIONS_SECRET_ACCESS_KEY: using-mock-aws-s3
         ORGANIZATIONS_ACCESS_KEY_ID: using-mock-aws-s3
@@ -143,12 +152,10 @@ jobs:
       env:
         NODE_ENV: testing
         STORAGE: "@userdashboard/storage-s3"
-        S3_ENDPOINT: http://localhost:4566
         S3_BUCKET_NAME: testing
         SECRET_ACCESS_KEY: using-mock-aws-s3
         ACCESS_KEY_ID: using-mock-aws-s3
         ORGANIZATIONS_STORAGE: "@userdashboard/storage-s3"
-        ORGANIZATIONS_S3_ENDPOINT: http://localhost:4566
         ORGANIZATIONS_S3_BUCKET_NAME: "testing2"
         ORGANIZATIONS_SECRET_ACCESS_KEY: using-mock-aws-s3
         ORGANIZATIONS_ACCESS_KEY_ID: using-mock-aws-s3
