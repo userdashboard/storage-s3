@@ -67,14 +67,12 @@ jobs:
         npm version patch
     - name: Set up project
       run: |
-        if [ ! -z "$S3_ENDPOINT" ]; then
-          export S3_ENDPOINT=http://localhost:4566
+        USE_S3_ENDPOINT="$S3_ENDPOINT"
+        if [ ! -z "$USE_S3_ENDPOINT" ]; then
+          export USE_S3_ENDPOINT=http://localhost:4566
         fi
-        if [ ! -z "$ORGANIZATIONS_S3_ENDPOINT" ]; then
-          export ORGANIZATIONS_S3_ENDPOINT=http://localhost:4566
-        fi
-        aws --endpoint=$S3_ENDPOINT s3 mb s3://testing
-        aws --endpoint=$S3_ENDPOINT s3 mb s3://testing2
+        aws --endpoint=$USE_S3_ENDPOINT s3 mb s3://testing
+        aws --endpoint=$USE_S3_ENDPOINT s3 mb s3://testing2
         HERE=`pwd`
         mkdir /tmp/project
         cd /tmp/project
