@@ -83,7 +83,6 @@ jobs:
         SECRET_ACCESS_KEY: using-mock-aws-s3
         ACCESS_KEY_ID: using-mock-aws-s3
         NODE_OPTIONS: --preserve-symlinks
-        LOG_LEVEL: "info,warn,error,log"
     - name: Test as Dashboard storage with module on other type
       run: |
         if [ -z "$S3_ENDPOINT" ]; then

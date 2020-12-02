@@ -22,10 +22,6 @@ You can use this storage for a module:
     MODULE_NAME_SECRET_ACCESS_KEY=secret from amazon
     MODULE_NAME_S3_ENDPOINT=nyc3.digitaloceanspaces.com
 
-## Testing
-
-This module is tested using [Dashboard](https://github.com/userdashboard/dashboard)'s test suite configured with this storage engine.
-
 # Dashboard
 
 Dashboard is a NodeJS project that provides a reusable account management system for web applications. 
