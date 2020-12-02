@@ -49,8 +49,8 @@ jobs:
         if [ ! -z "$USE_S3_ENDPOINT" ]; then
           export USE_S3_ENDPOINT=http://localhost:4566
         fi
-        aws --endpoint=$USE_S3_ENDPOINT s3 mb s3://testing
-        aws --endpoint=$USE_S3_ENDPOINT s3 mb s3://testing2
+        aws --endpoint-url=$USE_S3_ENDPOINT s3 mb s3://testing
+        aws --endpoint-url=$USE_S3_ENDPOINT s3 mb s3://testing2
         HERE=`pwd`
         mkdir /tmp/project
         cd /tmp/project
