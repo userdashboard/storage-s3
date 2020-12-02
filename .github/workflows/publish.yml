@@ -93,6 +93,9 @@ jobs:
         AWS_ACCESS_KEY_ID: using-mock-aws-s3
     - name: Test as only storage for Dashboard and modules
       run: |
+        if [ -z "$S3_ENDPOINT" ]; then
+          export S3_ENDPOINT="http://localhost:4566"
+        fi
         ./node_modules/.bin/mocha --file main.js --bail --exit --recursive --timeout 90000000 $(find ./node_modules/@userdashboard/*/ -name "*.test.js" | grep -i -v [a-z]/node_modules | sort -k5.1,8.1 -t /) | tee tests.txt
         TESTS=`cat tests.txt`
         if [[ "$TESTS" == *" 1)"* ]]; then
@@ -108,6 +111,9 @@ jobs:
         NODE_OPTIONS: --preserve-symlinks
     - name: Test as Dashboard storage with module on other type
       run: |
+        if [ -z "$S3_ENDPOINT" ]; then
+          export S3_ENDPOINT="http://localhost:4566"
+        fi
         ./node_modules/.bin/mocha --file main.js --bail --exit --recursive --timeout 90000000 $(find ./node_modules/@userdashboard/*/ -name "*.test.js" | grep -i -v [a-z]/node_modules | sort -k5.1,8.1 -t /) | tee tests.txt
         TESTS=`cat tests.txt`
         if [[ "$TESTS" == *" 1)"* ]]; then
@@ -125,6 +131,9 @@ jobs:
         NODE_OPTIONS: --preserve-symlinks
     - name: Test as module storage with Dashboard on other type
       run: |
+        if [ -z "$S3_ENDPOINT" ]; then
+          export S3_ENDPOINT="http://localhost:4566"
+        fi
         ./node_modules/.bin/mocha --file main.js --bail --exit --recursive --timeout 90000000 $(find ./node_modules/@userdashboard/*/ -name "*.test.js" | grep -i -v [a-z]/node_modules | sort -k5.1,8.1 -t /) | tee tests.txt
         TESTS=`cat tests.txt`
         if [[ "$TESTS" == *" 1)"* ]]; then
@@ -142,6 +151,9 @@ jobs:
         NODE_OPTIONS: --preserve-symlinks
     - name: Test as Dashboard and module storage using separate servers
       run: |
+        if [ -z "$S3_ENDPOINT" ]; then
+          export S3_ENDPOINT="http://localhost:4566"
+        fi
         ./node_modules/.bin/mocha --file main.js --bail --exit --recursive --timeout 90000000 $(find ./node_modules/@userdashboard/*/ -name "*.test.js" | grep -i -v [a-z]/node_modules | sort -k5.1,8.1 -t /) | tee tests.txt
         TESTS=`cat tests.txt`
         if [[ "$TESTS" == *" 1)"* ]]; then
