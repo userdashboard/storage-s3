@@ -46,8 +46,8 @@ jobs:
     - name: Set up project
       run: |
         USE_S3_ENDPOINT="$S3_ENDPOINT"
-        if [ ! -z "$USE_S3_ENDPOINT" ]; then
-          USE_S3_ENDPOINT=http://localhost:4566
+        if [ -z "$USE_S3_ENDPOINT" ]; then
+          USE_S3_ENDPOINT="http://localhost:4566"
         fi
         aws --endpoint-url=$USE_S3_ENDPOINT s3 mb s3://testing
         aws --endpoint-url=$USE_S3_ENDPOINT s3 mb s3://testing2
