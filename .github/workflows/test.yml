@@ -46,10 +46,10 @@ jobs:
     - name: Set up project
       run: |
         if [ ! -z "$S3_ENDPOINT" ]; then
-          export S3_ENDPOINT=http://0.0.0.0:4566
+          export S3_ENDPOINT=http://localhost:4566
         fi
         if [ ! -z "$ORGANIZATIONS_S3_ENDPOINT" ]; then
-          export ORGANIZATIONS_S3_ENDPOINT=http://0.0.0.0:4566
+          export ORGANIZATIONS_S3_ENDPOINT=http://localhost:4566
         fi
         aws s3 mb s3://testing
         aws s3 mb s3://testing2
