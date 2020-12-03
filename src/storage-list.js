@@ -194,7 +194,7 @@ module.exports = {
         })
       })
     }
-    if (process.env.NODE_ENV === 'testing') {
+    if (process.env.NODE_ENV === 'testing' && process.env.DELAY_WRITES) {
       container.write = util.promisify((path, itemid, callback) => {
         const params = {
           Bucket: storage.bucketName,
@@ -206,7 +206,7 @@ module.exports = {
             Log.error('error writing', error)
             return callback(new Error('unknown-error'))
           }
-          return setTimeout(callback, 0)
+          return setTimeout(callback, 100)
         })
       })
     }
