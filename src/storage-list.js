@@ -206,7 +206,7 @@ module.exports = {
             Log.error('error writing', error)
             return callback(new Error('unknown-error'))
           }
-          return setTimeout(callback, 100)
+          return setTimeout(callback, 10)
         })
       })
     }
