@@ -194,6 +194,22 @@ module.exports = {
         })
       })
     }
+    if (process.env.NODE_ENV === 'testing') {
+      container.write = util.promisify((path, itemid, callback) => {
+        const params = {
+          Bucket: storage.bucketName,
+          Key: `${storage.storagePath}/list/${path}/${itemid}`,
+          Body: ''
+        }
+        return putObject(params, (error) => {
+          if (error) {
+            Log.error('error writing', error)
+            return callback(new Error('unknown-error'))
+          }
+          return setTimeout(callback, 100)
+        })
+      })
+    }
     return callback(null, container)
   })
 }

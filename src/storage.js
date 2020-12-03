@@ -197,29 +197,6 @@ module.exports = {
       })
     }
     if (process.env.NODE_ENV === 'testing') {
-      container.write = util.promisify((file, contents, callback) => {
-        if (!file) {
-          return callback(new Error('invalid-file'))
-        }
-        if (!contents && contents !== '') {
-          return callback(new Error('invalid-contents'))
-        }
-        if (!contents.substring) {
-          contents = JSON.stringify(contents)
-        }
-        const params = {
-          Bucket: bucketName,
-          Key: `${storagePath}/${file}`,
-          Body: contents.toString()
-        }
-        return s3.putObject(params, (error) => {
-          if (error) {
-            Log.error('error writing', error)
-            return callback(new Error('unknown-error'))
-          }
-          return setTimeout(callback, 1)
-        })
-      })
       const listParams = {
         MaxKeys: 2147483647,
         Bucket: bucketName,
