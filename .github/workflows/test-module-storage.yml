@@ -1,9 +1,9 @@
-name: test
+name: test-module-storage
 
 on: [push]
 
 jobs:
-  test:
+  test-module-storage:
     runs-on: ubuntu-latest
     services:
       localstack:
@@ -69,36 +69,6 @@ jobs:
       env:
         AWS_SECRET_ACCESS_KEY: using-mock-aws-s3
         AWS_ACCESS_KEY_ID: using-mock-aws-s3
-    - name: Test as only storage for Dashboard and modules
-      run: |
-        if [ -z "$S3_ENDPOINT" ]; then
-          export S3_ENDPOINT="http://localhost:4566"
-        fi
-        ./node_modules/.bin/mocha --file main.js --exit --recursive --timeout 90000000 $(find ./node_modules/@userdashboard/*/ -name "*.test.js" | grep -i -v [a-z0-9]/node_modules | sort -k5.1,8.1 -t /)
-      working-directory: /tmp/project
-      env:
-        NODE_ENV: testing
-        STORAGE: "@userdashboard/storage-s3"
-        S3_BUCKET_NAME: testing
-        SECRET_ACCESS_KEY: using-mock-aws-s3
-        ACCESS_KEY_ID: using-mock-aws-s3
-        NODE_OPTIONS: --preserve-symlinks
-    - name: Test as Dashboard storage with module on other type
-      run: |
-        if [ -z "$S3_ENDPOINT" ]; then
-          export S3_ENDPOINT="http://localhost:4566"
-        fi
-        ./node_modules/.bin/mocha --file main.js --exit --recursive --timeout 90000000 $(find ./node_modules/@userdashboard/*/ -name "*.test.js" | grep -i -v [a-z0-9]/node_modules | sort -k5.1,8.1 -t /)
-      working-directory: /tmp/project
-      env:
-        NODE_ENV: testing
-        STORAGE: "@userdashboard/storage-s3"
-        S3_BUCKET_NAME: testing
-        SECRET_ACCESS_KEY: using-mock-aws-s3
-        ACCESS_KEY_ID: using-mock-aws-s3
-        ORGANIZATIONS_STORAGE: "@userdashboard/storage-redis"
-        ORGANIZATIONS_REDIS_URL: redis://localhost:6379
-        NODE_OPTIONS: --preserve-symlinks
     - name: Test as module storage with Dashboard on other type
       run: |
         if [ -z "$S3_ENDPOINT" ]; then
@@ -112,24 +82,6 @@ jobs:
         REDIS_URL: redis://localhost:6379
         ORGANIZATIONS_STORAGE: "@userdashboard/storage-s3"
         ORGANIZATIONS_S3_BUCKET_NAME: testing
-        ORGANIZATIONS_SECRET_ACCESS_KEY: using-mock-aws-s3
-        ORGANIZATIONS_ACCESS_KEY_ID: using-mock-aws-s3
-        NODE_OPTIONS: --preserve-symlinks
-    - name: Test as Dashboard and module using two instances of storage
-      run: |
-        if [ -z "$S3_ENDPOINT" ]; then
-          export S3_ENDPOINT="http://localhost:4566"
-        fi
-        ./node_modules/.bin/mocha --file main.js --exit --recursive --timeout 90000000 $(find ./node_modules/@userdashboard/*/ -name "*.test.js" | grep -i -v [a-z0-9]/node_modules | sort -k5.1,8.1 -t /)
-      working-directory: /tmp/project
-      env:
-        NODE_ENV: testing
-        STORAGE: "@userdashboard/storage-s3"
-        S3_BUCKET_NAME: testing
-        SECRET_ACCESS_KEY: using-mock-aws-s3
-        ACCESS_KEY_ID: using-mock-aws-s3
-        ORGANIZATIONS_STORAGE: "@userdashboard/storage-s3"
-        ORGANIZATIONS_S3_BUCKET_NAME: "testing2"
         ORGANIZATIONS_SECRET_ACCESS_KEY: using-mock-aws-s3
         ORGANIZATIONS_ACCESS_KEY_ID: using-mock-aws-s3
         NODE_OPTIONS: --preserve-symlinks
