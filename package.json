@@ -1,11 +1,9 @@
 {
   "dependencies": {
-    "aws-sdk": "^2.803.0"
-  },
-  "description": "Use Amazon S3 as storage for Dashboard",
-  "devDependencies": {
+    "aws-sdk": "^2.803.0",
     "@userdashboard/dashboard": ">=1"
   },
+  "description": "Use Amazon S3 as storage for Dashboard",
   "engines": {
     "node": ">=14.0",
     "npm": ">=6.0"
@@ -13,12 +11,6 @@
   "license": "MIT",
   "main": "index.js",
   "name": "@userdashboard/storage-s3",
-  "optionalDependencies": {
-    "@userdashboard/dashboard": ">=1"
-  },
-  "peerDependencies": {
-    "@userdashboard/dashboard": ">=1"
-  },
   "repository": {
     "type": "git",
     "url": "git://github.com/userdashboard/storage-s3.git"
