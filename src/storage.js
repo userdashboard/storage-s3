@@ -1,5 +1,3 @@
-const fs = require('fs')
-const path = require('path')
 const util = require('util')
 
 module.exports = {
@@ -8,14 +6,7 @@ module.exports = {
       callback = moduleName
       moduleName = null
     }
-    let Log
-    const dashboardPath1 = path.join(global.applicationPath, 'node_modules/@userdashboard/dashboard/src/log.js')
-    if (fs.existsSync(dashboardPath1)) {
-      Log = require(dashboardPath1)('s3')
-    } else {
-      const dashboardPath2 = path.join(global.applicationPath, 'src/log.js')
-      Log = require(dashboardPath2)('s3 ')
-    }
+    const Log = require('@userdashboard/dashboard/src/log.js')('s3')
     const accessKeyId = process.env[`${moduleName}_ACCESS_KEY_ID`] || process.env.ACCESS_KEY_ID
     const secretAccessKey = process.env[`${moduleName}_SECRET_ACCESS_KEY`] || process.env.SECRET_ACCESS_KEY
     const bucketName = process.env[`${moduleName}_S3_BUCKET_NAME`] || process.env.S3_BUCKET_NAME

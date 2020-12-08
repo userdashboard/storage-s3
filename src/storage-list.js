@@ -1,5 +1,3 @@
-const fs = require('fs')
-const path = require('path')
 const util = require('util')
 
 module.exports = {
@@ -13,14 +11,7 @@ module.exports = {
         storage = null
       }
     }
-    const dashboardPath1 = path.join(global.applicationPath, 'node_modules/@userdashboard/dashboard/src/log.js')
-    let Log
-    if (fs.existsSync(dashboardPath1)) {
-      Log = require(dashboardPath1)('s3-list')
-    } else {
-      const dashboardPath2 = path.join(global.applicationPath, 'src/log.js')
-      Log = require(dashboardPath2)('s3-list')
-    }
+    const Log = require('@userdashboard/dashboard/src/log.js')('s3')
     let putObject = storage.s3.putObject
     if (process.env.NODE_ENV === 'testing') {
       putObject = (params, callback) => {
