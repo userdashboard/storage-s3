@@ -1,6 +1,9 @@
 {
   "dependencies": {
     "aws-sdk": "^2.804.0"
+  }, 
+  "peerDependencies": {
+    "@userdashboard/dashboard": "1.0.0 - 9999.9999.9999"
   },
   "description": "Use Amazon S3 as storage for Dashboard",
   "engines": {
